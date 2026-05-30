@@ -201,7 +201,21 @@ function ContentViewerPage() {
             </>
           )}
 
-          {contentType !== 'richtext' && contentType !== 'download' && !node.metadata?.downloadBlocked && fileData && (
+          {contentType === 'code' && !node.metadata?.downloadBlocked && node.content?.body && (
+            <Button variant="secondary" size="sm" icon={Download} onClick={() => {
+                const blob = new Blob([node.content.body], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = node.metadata?.originalName || `${node.name}${node.metadata?.extension || '.txt'}`;
+                link.click();
+                URL.revokeObjectURL(url);
+            }}>
+              Baixar Código
+            </Button>
+          )}
+
+          {contentType !== 'richtext' && contentType !== 'download' && contentType !== 'code' && !node.metadata?.downloadBlocked && fileData && (
             <Button variant="secondary" size="sm" icon={Download} onClick={() => {
                 const blob = base64ToBlob(fileData);
                 const url = URL.createObjectURL(blob);

@@ -57,26 +57,19 @@ function Header() {
       </div>
 
       <div className="header__center">
-        <div 
-          className="header__copy-link" 
-          onClick={handleCopyLink}
-          title="Copiar link da página atual"
-          style={{
-            display: 'flex', alignItems: 'center', gap: '0.5rem', 
-            background: 'var(--gray-100)', padding: '0.4rem 0.75rem', 
-            borderRadius: 'var(--radius-full)', cursor: 'pointer',
-            fontSize: '13px', color: 'var(--gray-600)',
-            border: '1px solid var(--gray-200)', transition: 'all 0.2s'
-          }}
-        >
-          <span style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {window.location.host}{window.location.pathname}
-          </span>
-          {copied ? <Check size={14} color="var(--success-500)" /> : <Copy size={14} />}
-        </div>
+        {/* Vazio no centro ou pode adicionar algo no futuro */}
       </div>
 
       <div className="header__right">
+        
+        <button
+          className="header__icon-btn"
+          onClick={handleCopyLink}
+          aria-label="Copiar link"
+          title="Copiar link do portfólio"
+        >
+          {copied ? <Check size={18} color="var(--success-500)" /> : <Copy size={18} />}
+        </button>
         <SearchBar />
         {isAuthenticated ? (
           <div className="header__admin-group">
