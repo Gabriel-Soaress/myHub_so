@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router';
-import { Menu, Lock, LogOut, ShieldCheck, GraduationCap, Settings, Copy, Check } from 'lucide-react';
+import { Menu, Lock, LogOut, ShieldCheck, GraduationCap, Settings, Copy, Check, Layout } from 'lucide-react';
 import { useState } from 'react';
 import SearchBar from '../ui/SearchBar';
 import useAuthStore from '../../store/useAuthStore';
