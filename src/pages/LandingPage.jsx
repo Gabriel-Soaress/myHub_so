@@ -28,6 +28,7 @@ function LandingPage() {
   const subtitle = landingSettings.landingSubtitle || COURSE_NAME;
   const description = landingSettings.landingDescription || 'Uma coleção organizada de atividades, reflexões e projetos desenvolvidos ao longo da disciplina — documentando o processo de aprendizagem e crescimento profissional.';
   const color = landingSettings.landingColor || '#4f46e5';
+  const footerText = landingSettings.landingFooter || 'Universidade · Engenharia de Software';
 
   return (
     <div className="landing" style={{ '--primary-500': color, '--primary-600': color }}>
@@ -109,7 +110,7 @@ function LandingPage() {
       {/* Footer */}
       <footer className="landing__footer animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
         <p>Atualizado em {formatDate(new Date().toISOString())}</p>
-        <p>{INSTITUTION_NAME} · {COURSE_NAME}</p>
+        <p>{footerText}</p>
       </footer>
     </div>
   );

@@ -21,6 +21,7 @@ function SettingsModal() {
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [description, setDescription] = useState('');
+  const [footer, setFooter] = useState('');
   const [color, setColor] = useState('');
 
   // Password State
@@ -33,6 +34,7 @@ function SettingsModal() {
       setTitle(landingSettings.landingTitle || APP_NAME);
       setSubtitle(landingSettings.landingSubtitle || COURSE_NAME);
       setDescription(landingSettings.landingDescription || 'Um espaço dedicado à organização e reflexão sobre a jornada de aprendizado.');
+      setFooter(landingSettings.landingFooter || 'Universidade · Engenharia de Software');
       setColor(landingSettings.landingColor || 'var(--primary-500)');
       
       setOldPassword('');
@@ -49,6 +51,7 @@ function SettingsModal() {
       landingTitle: title,
       landingSubtitle: subtitle,
       landingDescription: description,
+      landingFooter: footer,
       landingColor: color
     });
     closeModal();
@@ -122,6 +125,15 @@ function SettingsModal() {
               rows={3}
               value={description} 
               onChange={e => setDescription(e.target.value)} 
+            />
+          </div>
+          <div className="admin-form__group">
+            <label className="admin-form__label">Texto do Rodapé (Ex: Universidade · Curso)</label>
+            <input 
+              type="text" 
+              className="admin-form__input" 
+              value={footer} 
+              onChange={e => setFooter(e.target.value)} 
             />
           </div>
           <div className="admin-form__group">

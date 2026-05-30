@@ -29,7 +29,8 @@ export default async function handler(req, res) {
       landingTitle: 'Portfólio Reflexivo',
       landingSubtitle: 'Engenharia de Software',
       landingDescription: 'Uma coleção organizada de atividades, reflexões e projetos desenvolvidos ao longo da disciplina.',
-      landingColor: randomColor
+      landingColor: randomColor,
+      landingFooter: 'Universidade · Engenharia de Software'
     });
 
     await sql`
