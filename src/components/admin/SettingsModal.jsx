@@ -12,7 +12,7 @@ function SettingsModal() {
   const closeModal = useUIStore((s) => s.closeModal);
   
   const landingSettings = useAuthStore((s) => s.landingSettings);
-  const updateLandingSettings = useAuthStore((s) => s.updateLandingSettings);
+  const saveSettings = useAuthStore((s) => s.saveSettings);
   const changePassword = useAuthStore((s) => s.changePassword);
 
   const [activeTab, setActiveTab] = useState('landing');
@@ -44,8 +44,8 @@ function SettingsModal() {
 
   if (!isOpen) return null;
 
-  const handleSaveLanding = () => {
-    updateLandingSettings({
+  const handleSaveLanding = async () => {
+    await saveSettings({
       landingTitle: title,
       landingSubtitle: subtitle,
       landingDescription: description,

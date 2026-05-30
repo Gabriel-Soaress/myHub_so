@@ -38,7 +38,7 @@ function FolderEditor() {
     }
   }, [isOpen, existing]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim()) return;
 
     const nodeData = {
@@ -53,9 +53,9 @@ function FolderEditor() {
     };
 
     if (isEditing && existing?.id) {
-      updateNode(existing.id, nodeData);
+      await updateNode(existing.id, nodeData);
     } else {
-      createNode({
+      await createNode({
         ...nodeData,
         parentId: modalData?.parentId || null,
       });

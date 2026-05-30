@@ -45,32 +45,36 @@ function ContentViewerPage() {
   const [originalParentId, setOriginalParentId] = useState(null);
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const activeSlug = useAuthStore((s) => s.activeSlug);
   const unlockedNodes = useAuthStore((s) => s.unlockedNodes);
   const unlockNode = useAuthStore((s) => s.unlockNode);
   const openModal = useUIStore((s) => s.openModal);
   const refreshKey = useUIStore((s) => s.refreshKey);
 
   useEffect(() => {
-    setLoading(true);
-    const found = getNodeById(nodeId);
-    
-    if (found) {
-      setNode(found);
-      setOriginalParentId(found.parentId);
+    const loadContent = async () => {
+      setLoading(true);
+      const found = getNodeById(nodeId);
       
-      const lockStatus = isNodeLockedCascading(found.id, isAuthenticated, unlockedNodes);
-      
-      if (lockStatus.locked) {
-        // Locked
-      } else if (found.content?.type !== 'richtext') {
-        const data = getFile(nodeId);
-        setFileData(data);
+      if (found) {
+        setNode(found);
+        setOriginalParentId(found.parentId);
+        
+        const lockStatus = isNodeLockedCascading(found.id, isAuthenticated, unlockedNodes);
+        
+        if (lockStatus.locked) {
+          // Locked
+        } else if (found.content?.type !== 'richtext') {
+          const data = await getFile(nodeId);
+          setFileData(data);
+        }
+      } else {
+        setNode(null);
       }
-    } else {
-      setNode(null);
-    }
 
-    setLoading(false);
+      setLoading(false);
+    };
+    loadContent();
   }, [nodeId, refreshKey, isAuthenticated, unlockedNodes]);
 
   const lockStatus = node ? isNodeLockedCascading(node.id, isAuthenticated, unlockedNodes) : { locked: false };
@@ -97,7 +101,7 @@ function ContentViewerPage() {
         <Button 
           variant="secondary" 
           icon={ArrowLeft} 
-          onClick={() => navigate(originalParentId ? `/explorar/${originalParentId}` : '/explorar')}
+          onClick={() => navigate(originalParentId ? `/${activeSlug}/explorar/${originalParentId}` : `/${activeSlug}/explorar`)}
         >
           Voltar para a pasta
         </Button>
@@ -115,7 +119,7 @@ function ContentViewerPage() {
     return (
       <div className="content-viewer">
         <Breadcrumb nodeId={nodeId} />
-        <button className="content-viewer__back" onClick={() => navigate(node.parentId ? `/explorar/${node.parentId}` : '/explorar')}>
+        <button className="content-viewer__back" onClick={() => navigate(node.parentId ? `/${activeSlug}/explorar/${node.parentId}` : `/${activeSlug}/explorar`)}>
           <ArrowLeft size={16} /><span>Voltar</span>
         </button>
         <div className="content-viewer__locked" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
@@ -157,7 +161,7 @@ function ContentViewerPage() {
       {/* Back button */}
       <button
         className="content-viewer__back"
-        onClick={() => navigate(node.parentId ? `/explorar/${node.parentId}` : '/explorar')}
+        onClick={() => navigate(node.parentId ? `/${activeSlug}/explorar/${node.parentId}` : `/${activeSlug}/explorar`)}
       >
         <ArrowLeft size={16} />
         <span>Voltar</span>

@@ -45,7 +45,7 @@ function CodeEditorModal() {
     }
   }, [isOpen, existing]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim()) return;
 
     const nodeData = {
@@ -64,9 +64,9 @@ function CodeEditorModal() {
     };
 
     if (isEditing && existing?.id) {
-      updateNode(existing.id, nodeData);
+      await updateNode(existing.id, nodeData);
     } else {
-      createNode({
+      await createNode({
         ...nodeData,
         type: CONTENT_TYPES.CODE,
         parentId: modalData?.parentId || null,

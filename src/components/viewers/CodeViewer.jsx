@@ -15,35 +15,38 @@ function CodeViewer({ nodeId, node }) {
   const isAuthenticated = useAuthStore(s => s.isAuthenticated);
 
   useEffect(() => {
-    // Para conteúdo criado via UI
-    if (node.content?.body) {
-      setCode(node.content.body);
-      setOriginalCode(node.content.body);
-    } else {
-      // Para arquivo salvo (ex: upload)
-      const base64 = getFile(nodeId);
-      if (base64) {
-        const parts = base64.split(',');
-        if (parts.length > 1) {
-          try {
-            // Decodifica base64 (lidando com unicode corretamente)
-            const binary = atob(parts[1]);
-            const bytes = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) {
-              bytes[i] = binary.charCodeAt(i);
+    const loadCode = async () => {
+      // Para conteúdo criado via UI
+      if (node.content?.body) {
+        setCode(node.content.body);
+        setOriginalCode(node.content.body);
+      } else {
+        // Para arquivo salvo (ex: upload)
+        const base64 = await getFile(nodeId);
+        if (base64) {
+          const parts = base64.split(',');
+          if (parts.length > 1) {
+            try {
+              // Decodifica base64 (lidando com unicode corretamente)
+              const binary = atob(parts[1]);
+              const bytes = new Uint8Array(binary.length);
+              for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+              }
+              const decoder = new TextDecoder('utf-8');
+              const decoded = decoder.decode(bytes);
+              setCode(decoded);
+              setOriginalCode(decoded);
+            } catch (e) {
+              console.error('Falha ao decodificar código base64', e);
+              setCode('Erro ao ler arquivo.');
+              setOriginalCode('Erro ao ler arquivo.');
             }
-            const decoder = new TextDecoder('utf-8');
-            const decoded = decoder.decode(bytes);
-            setCode(decoded);
-            setOriginalCode(decoded);
-          } catch (e) {
-            console.error('Falha ao decodificar código base64', e);
-            setCode('Erro ao ler arquivo.');
-            setOriginalCode('Erro ao ler arquivo.');
           }
         }
       }
-    }
+    };
+    loadCode();
   }, [nodeId, node, refreshKey]);
 
   // Infer language from extension or metadata
@@ -66,7 +69,7 @@ function CodeViewer({ nodeId, node }) {
     
     if (node.content?.type === 'code') {
       // Atualiza body diretamente
-      updateNode(nodeId, {
+      await updateNode(nodeId, {
         content: {
           ...node.content,
           body: code,
@@ -84,10 +87,10 @@ function CodeViewer({ nodeId, node }) {
       // Mantemos o mimetype original ou derivamos um
       const mime = node.content?.type || 'text/plain';
       const dataUrl = `data:${mime};base64,${newBase64}`;
-      saveFile(nodeId, dataUrl);
+      await saveFile(nodeId, dataUrl);
       
       // Update fileSize
-      updateNode(nodeId, {
+      await updateNode(nodeId, {
         metadata: {
           ...node.metadata,
           fileSize: bytes.byteLength + ' B', // simple format for now

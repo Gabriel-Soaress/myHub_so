@@ -84,7 +84,7 @@ function FileUploader() {
       const base64Data = await fileToBase64(file);
       const contentType = detectContentType(file.type);
 
-      const node = createNode({
+      const node = await createNode({
         name: name.trim(),
         type: contentType,
         parentId: modalData?.parentId || null,
@@ -105,7 +105,7 @@ function FileUploader() {
         },
       });
 
-      saveFile(node.id, base64Data);
+      await saveFile(node.id, base64Data);
       triggerRefresh();
       closeModal();
     } catch (err) {

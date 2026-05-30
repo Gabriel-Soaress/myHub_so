@@ -271,7 +271,7 @@ function ContentEditor() {
     }
   }, [isOpen, existing, editor]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim() || !editor) return;
 
     const htmlContent = editor.getHTML();
@@ -290,9 +290,9 @@ function ContentEditor() {
     };
 
     if (isEditing && existing?.id) {
-      updateNode(existing.id, nodeData);
+      await updateNode(existing.id, nodeData);
     } else {
-      createNode({
+      await createNode({
         ...nodeData,
         type: CONTENT_TYPES.RICHTEXT,
         parentId: modalData?.parentId || null,

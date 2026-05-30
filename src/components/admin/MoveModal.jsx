@@ -51,7 +51,7 @@ function MoveModal() {
 
   if (!isOpen || !modalData) return null;
 
-  const handleMove = () => {
+  const handleMove = async () => {
     // If selectedFolderId is '', it means move to Root (null)
     const targetId = selectedFolderId || null;
     
@@ -61,7 +61,7 @@ function MoveModal() {
       return;
     }
 
-    moveNode(modalData.id, targetId);
+    await moveNode(modalData.id, targetId);
     triggerRefresh();
     closeModal();
   };

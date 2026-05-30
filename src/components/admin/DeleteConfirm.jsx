@@ -8,10 +8,10 @@ function DeleteConfirm({ onAfterDelete }) {
   const { activeModal, modalData, closeModal, triggerRefresh } = useUIStore();
   const isOpen = activeModal === 'delete';
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!modalData?.id) return;
 
-    deleteNodeRecursive(modalData.id);
+    await deleteNodeRecursive(modalData.id);
     triggerRefresh();
     closeModal();
 
