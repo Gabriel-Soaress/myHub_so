@@ -232,4 +232,10 @@
   .explorer-grid {
     grid-template-columns: 1fr;
   }
+  
+  .folder-card__actions,
+  .file-card__actions,
+  .super-folder-card__actions {
+    opacity: 1;
+  }
 }
