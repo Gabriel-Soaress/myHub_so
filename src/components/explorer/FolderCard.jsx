@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { Folder, MoreVertical, Pencil, Trash2, Download, Lock } from 'lucide-react';
+import { Folder, MoreVertical, Pencil, Trash2, Download, Lock, MoveRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getChildren } from '../../services/storageService';
 import { downloadFolderAsZip } from '../../services/exportService';
@@ -68,6 +68,14 @@ function FolderCard({ node }) {
           )}
           {isAuthenticated && (
             <>
+              <button
+                className="folder-card__action-btn"
+                onClick={(e) => { e.stopPropagation(); openModal('move', node); }}
+                aria-label="Mover pasta"
+                title="Mover"
+              >
+                <MoveRight size={14} />
+              </button>
               <button
                 className="folder-card__action-btn"
                 onClick={(e) => { e.stopPropagation(); handleEdit(e); }}

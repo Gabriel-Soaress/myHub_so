@@ -13,7 +13,8 @@ import {
   FileCode,
   Lock,
   Download,
-  ChevronLeft
+  ChevronLeft,
+  MoveRight
 } from 'lucide-react';
 import { getNodeById, getFile, isNodeLockedCascading, updateNode, deleteNodeRecursive } from '../services/storageService';
 import { exportHtmlToPdf, exportHtmlToDocx } from '../services/exportService';
@@ -220,6 +221,9 @@ function ContentViewerPage() {
                 </Button>
               )}
               
+              <Button variant="ghost" size="sm" icon={MoveRight} onClick={() => openModal('move', node)}>
+                Mover
+              </Button>
               <Button variant="ghost" size="sm" icon={Pencil} onClick={handleEditMetadata}>
                 {contentType === 'richtext' ? 'Opções' : 'Editar'}
               </Button>
