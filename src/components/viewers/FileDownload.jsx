@@ -4,10 +4,10 @@ import { base64ToBlob, formatFileSize } from '../../utils/helpers';
 import './Viewers.css';
 
 function FileDownload({ nodeId, node }) {
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!nodeId) return;
 
-    const data = getFile(nodeId);
+    const data = await getFile(nodeId);
     if (!data) return;
 
     const blob = base64ToBlob(data);

@@ -16,18 +16,21 @@ function ImageViewer({ nodeId, name }) {
     setLoading(true);
     setError(false);
 
-    try {
-      const data = getFile(nodeId);
-      if (data) {
-        setImageSrc(data);
-      } else {
+    const fetchImage = async () => {
+      try {
+        const data = await getFile(nodeId);
+        if (data) {
+          setImageSrc(data);
+        } else {
+          setError(true);
+        }
+      } catch {
         setError(true);
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
+    };
+    fetchImage();
   }, [nodeId]);
 
   if (loading) {

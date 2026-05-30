@@ -48,9 +48,11 @@ function Header() {
         >
           <Menu size={20} />
         </button>
-        <Link to={`/${activeSlug}`} className="header__logo">
-          <GraduationCap size={24} className="header__logo-icon" />
-          <span className="header__logo-text">{APP_NAME}</span>
+        <Link to={`/${activeSlug}`} className="header__brand">
+          <div className="header__logo">
+            <Layout size={20} color="var(--primary-600)" />
+          </div>
+          <span className="header__title">{APP_NAME}</span>
         </Link>
       </div>
 

@@ -19,7 +19,7 @@ function DocxViewer({ nodeId }) {
       setLoading(true);
       setError(false);
       try {
-        const data = getFile(nodeId);
+        const data = await getFile(nodeId);
         if (data) {
           const blob = base64ToBlob(data);
           if (isMounted && containerRef.current) {

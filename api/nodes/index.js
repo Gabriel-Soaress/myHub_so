@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     try {
       await sql`
         INSERT INTO nodes (id, user_slug, parent_id, name, type, metadata, content, item_order)
-        VALUES (${id}, ${tenant}, ${parentId || null}, ${name}, ${type}, ${metadata || '{}'}, ${content || '{}'}, ${order || 0})
+        VALUES (${id}, ${tenant}, ${parentId || null}, ${name}, ${type}, ${JSON.stringify(metadata || {})}::jsonb, ${JSON.stringify(content || {})}::jsonb, ${order || 0})
       `;
       return res.status(201).json({ success: true, id });
     } catch (error) {

@@ -34,18 +34,21 @@ function PdfViewer({ nodeId }) {
     setLoading(true);
     setError(false);
 
-    try {
-      const data = getFile(nodeId);
-      if (data) {
-        setFileData(data);
-      } else {
+    const fetchPdf = async () => {
+      try {
+        const data = await getFile(nodeId);
+        if (data) {
+          setFileData(data);
+        } else {
+          setError(true);
+        }
+      } catch {
         setError(true);
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
+    };
+    fetchPdf();
   }, [nodeId]);
 
   const onDocumentLoadSuccess = ({ numPages: total }) => {

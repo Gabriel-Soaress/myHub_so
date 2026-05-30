@@ -15,8 +15,8 @@ export default async function handler(req, res) {
         await sql`
           UPDATE nodes 
           SET name = COALESCE(${name}, name),
-              metadata = COALESCE(${metadata}, metadata),
-              content = COALESCE(${content}, content),
+              metadata = COALESCE(${metadata ? JSON.stringify(metadata) : null}::jsonb, metadata),
+              content = COALESCE(${content ? JSON.stringify(content) : null}::jsonb, content),
               parent_id = ${parentId},
               updated_at = CURRENT_TIMESTAMP
           WHERE id = ${id}
@@ -25,8 +25,8 @@ export default async function handler(req, res) {
         await sql`
           UPDATE nodes 
           SET name = COALESCE(${name}, name),
-              metadata = COALESCE(${metadata}, metadata),
-              content = COALESCE(${content}, content),
+              metadata = COALESCE(${metadata ? JSON.stringify(metadata) : null}::jsonb, metadata),
+              content = COALESCE(${content ? JSON.stringify(content) : null}::jsonb, content),
               updated_at = CURRENT_TIMESTAMP
           WHERE id = ${id}
         `;
