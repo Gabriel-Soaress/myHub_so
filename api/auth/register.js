@@ -23,9 +23,18 @@ export default async function handler(req, res) {
       return res.status(409).json({ success: false, error: 'E-mail ou link já em uso.' });
     }
 
+    const defaultColors = ['#4f46e5', '#7c3aed', '#2563eb', '#059669', '#d97706', '#db2777'];
+    const randomColor = defaultColors[Math.floor(Math.random() * defaultColors.length)];
+    const defaultSettings = JSON.stringify({
+      landingTitle: 'Portfólio Reflexivo',
+      landingSubtitle: 'Engenharia de Software',
+      landingDescription: 'Uma coleção organizada de atividades, reflexões e projetos desenvolvidos ao longo da disciplina.',
+      landingColor: randomColor
+    });
+
     await sql`
-      INSERT INTO users (name, email, slug, password_hash)
-      VALUES (${name}, ${email}, ${slug}, ${passwordHash})
+      INSERT INTO users (name, email, slug, password_hash, landing_settings)
+      VALUES (${name}, ${email}, ${slug}, ${passwordHash}, ${defaultSettings}::jsonb)
     `;
 
     return res.status(200).json({ success: true, slug });

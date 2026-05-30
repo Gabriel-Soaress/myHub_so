@@ -27,7 +27,7 @@ function LandingPage() {
   const title = landingSettings.landingTitle || APP_NAME;
   const subtitle = landingSettings.landingSubtitle || COURSE_NAME;
   const description = landingSettings.landingDescription || 'Uma coleção organizada de atividades, reflexões e projetos desenvolvidos ao longo da disciplina — documentando o processo de aprendizagem e crescimento profissional.';
-  const color = landingSettings.landingColor || 'var(--primary-500)';
+  const color = landingSettings.landingColor || '#4f46e5';
 
   return (
     <div className="landing" style={{ '--primary-500': color, '--primary-600': color }}>
