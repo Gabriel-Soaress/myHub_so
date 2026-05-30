@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router';
-import { Menu, Lock, LogOut, ShieldCheck, GraduationCap, Settings, Copy, Check, Layout } from 'lucide-react';
+import { Menu, Lock, LogOut, ShieldCheck, Settings, Share2, Check, Layout } from 'lucide-react';
 import { useState } from 'react';
 import SearchBar from '../ui/SearchBar';
 import useAuthStore from '../../store/useAuthStore';
@@ -30,7 +30,7 @@ function Header() {
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.origin + window.location.pathname);
+    navigator.clipboard.writeText(`${window.location.origin}/${activeSlug}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -61,14 +61,22 @@ function Header() {
       </div>
 
       <div className="header__right">
-        
         <button
-          className="header__icon-btn"
+          className="header__share-btn"
           onClick={handleCopyLink}
-          aria-label="Copiar link"
+          aria-label="Compartilhar portfólio"
           title="Copiar link do portfólio"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            background: 'var(--primary-50)', color: 'var(--primary-600)',
+            padding: '0.4rem 0.75rem', borderRadius: 'var(--radius-full)',
+            border: '1px solid var(--primary-100)', fontSize: '13px',
+            fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s',
+            marginRight: '0.5rem'
+          }}
         >
-          {copied ? <Check size={18} color="var(--success-500)" /> : <Copy size={18} />}
+          {copied ? <Check size={16} /> : <Share2 size={16} />}
+          {copied ? 'Link Copiado!' : 'Compartilhar'}
         </button>
         <SearchBar />
         {isAuthenticated ? (
