@@ -11,25 +11,32 @@ const useAuthStore = create((set, get) => ({
   loginError: '',
   unlockedNodes: [],
   landingSettings: {},
+  tenantNotFound: false,
 
   init: async (slug) => {
     // Carrega settings da API
     let settings = {};
+    let notFound = false;
     try {
       const res = await fetch(`/api/settings?tenant=${slug}`);
-      if (res.ok) settings = await res.json();
+      if (res.ok) {
+        settings = await res.json();
+      } else if (res.status === 404) {
+        notFound = true;
+      }
     } catch (err) {
       console.error('Failed to load settings', err);
     }
     
     // Auth state continua local (para manter a sessão do admin sem cookie complexo)
-    const isAuth = localStorage.getItem(getTenantAuthKey(slug)) === 'true';
+    const isAuth = sessionStorage.getItem(getTenantAuthKey(slug)) === 'true';
     
     set({
       activeSlug: slug,
       isAuthenticated: isAuth,
       landingSettings: settings,
-      unlockedNodes: []
+      unlockedNodes: [],
+      tenantNotFound: notFound
     });
   },
 
@@ -60,8 +67,8 @@ const useAuthStore = create((set, get) => ({
       }
 
       // Auto-login after register
-      localStorage.setItem(getTenantAuthKey(slug), 'true');
-      set({ isAuthenticated: true, activeSlug: slug });
+      sessionStorage.setItem(getTenantAuthKey(slug), 'true');
+      set({ isAuthenticated: true, activeSlug: slug, tenantNotFound: false });
       return { success: true };
     } catch (err) {
       return { success: false, error: 'Erro de rede' };
@@ -102,8 +109,8 @@ const useAuthStore = create((set, get) => ({
       }
 
       const targetSlug = data.slug;
-      localStorage.setItem(getTenantAuthKey(targetSlug), 'true');
-      set({ isAuthenticated: true, isLoginModalOpen: false, loginError: '', activeSlug: targetSlug });
+      sessionStorage.setItem(getTenantAuthKey(targetSlug), 'true');
+      set({ isAuthenticated: true, isLoginModalOpen: false, loginError: '', activeSlug: targetSlug, tenantNotFound: false });
       return targetSlug;
     } catch (err) {
       set({ loginError: 'Erro de rede' });
@@ -114,7 +121,7 @@ const useAuthStore = create((set, get) => ({
   logout: () => {
     const slug = get().activeSlug;
     if (slug) {
-      localStorage.removeItem(getTenantAuthKey(slug));
+      sessionStorage.removeItem(getTenantAuthKey(slug));
     }
     set({ isAuthenticated: false, unlockedNodes: [] });
   },

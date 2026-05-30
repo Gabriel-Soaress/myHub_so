@@ -30,20 +30,16 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST' || req.method === 'PUT') {
-    const { data, append } = req.body;
+    const { data } = req.body;
     if (!data) {
       return res.status(400).json({ error: 'File data is required' });
     }
     
     try {
-      // Upsert or Append
+      // Upsert
       const existing = await sql`SELECT node_id FROM files WHERE node_id = ${nodeId}`;
       if (existing.length > 0) {
-        if (append) {
-          await sql`UPDATE files SET data = data || ${data} WHERE node_id = ${nodeId}`;
-        } else {
-          await sql`UPDATE files SET data = ${data} WHERE node_id = ${nodeId}`;
-        }
+        await sql`UPDATE files SET data = ${data} WHERE node_id = ${nodeId}`;
       } else {
         await sql`INSERT INTO files (node_id, data) VALUES (${nodeId}, ${data})`;
       }

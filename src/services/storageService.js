@@ -191,15 +191,11 @@ export function countByType() {
 
 export async function saveFile(nodeId, base64Data) {
   try {
-    const chunkSize = 3 * 1024 * 1024; // 3MB em caracteres
-    for (let i = 0; i < base64Data.length; i += chunkSize) {
-      const chunk = base64Data.slice(i, i + chunkSize);
-      await fetch(`/api/file?nodeId=${nodeId}&tenant=${activeTenant}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: chunk, append: i > 0 })
-      });
-    }
+    await fetch(`/api/file?nodeId=${nodeId}&tenant=${activeTenant}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: base64Data })
+    });
   } catch (err) {
     console.error('Failed to save file in DB', err);
   }
