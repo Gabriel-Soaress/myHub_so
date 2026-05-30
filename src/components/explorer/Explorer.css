@@ -1,0 +1,235 @@
+/* ============================================================
+   Explorer — FolderCard, FileCard, ExplorerGrid
+   ============================================================ */
+
+/* --- Explorer Grid --- */
+.explorer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-5);
+}
+
+/* --- Shared Card Base --- */
+.folder-card,
+.file-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-5);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.folder-card:hover,
+.file-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-color-hover);
+}
+
+/* --- Card Header --- */
+.folder-card__header,
+.file-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+/* --- Icon container --- */
+.folder-card__icon,
+.file-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+/* --- Actions (admin) --- */
+.folder-card__actions,
+.file-card__actions {
+  display: flex;
+  gap: var(--space-1);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.folder-card:hover .folder-card__actions,
+.file-card:hover .file-card__actions {
+  opacity: 1;
+}
+
+.folder-card__action-btn,
+.file-card__action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.folder-card__action-btn:hover,
+.file-card__action-btn:hover {
+  background: var(--gray-100);
+  color: var(--text-primary);
+}
+
+.folder-card__action-btn--danger:hover,
+.file-card__action-btn--danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+/* --- Name --- */
+.folder-card__name,
+.file-card__name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--space-1);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* --- Description --- */
+.folder-card__description,
+.file-card__description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+  margin-bottom: var(--space-3);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* --- Meta --- */
+.folder-card__count,
+.file-card__date {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  margin-top: 0.25rem;
+}
+
+/* Super Folder Card */
+.super-folder-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  min-height: 200px;
+}
+
+.super-folder-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.super-folder-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.super-folder-card__header,
+.super-folder-card__body,
+.super-folder-card__footer {
+  position: relative;
+  z-index: 2;
+}
+
+.super-folder-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.super-folder-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.super-folder-card:hover .super-folder-card__actions {
+  opacity: 1;
+}
+
+.super-folder-card__body {
+  flex: 1;
+}
+
+.super-folder-card__name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.super-folder-card__description {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.super-folder-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.super-folder-card__count {
+  color: var(--gray-500);
+}
+
+.super-folder-card__explore {
+  color: inherit;
+  opacity: 0.8;
+  transition: transform var(--transition-fast);
+}
+
+.super-folder-card:hover .super-folder-card__explore {
+  transform: translateX(4px);
+  opacity: 1;
+}
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+  .explorer-grid {
+    grid-template-columns: 1fr;
+  }
+}
