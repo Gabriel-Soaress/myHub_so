@@ -27,6 +27,20 @@ function VideoViewer({ nodeId, name, fileData }) {
       >
         Seu navegador não suporta a tag de vídeo.
       </video>
+      <Button 
+        variant="secondary" 
+        icon={Download}
+        onClick={() => {
+          const a = document.createElement('a');
+          a.href = fileData;
+          a.download = name;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }}
+      >
+        Baixar Vídeo
+      </Button>
     </div>
   );
 }

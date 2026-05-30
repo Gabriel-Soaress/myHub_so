@@ -194,6 +194,7 @@ function PdfViewer({ nodeId }) {
           <Page
             pageNumber={pageNumber}
             scale={scale}
+            width={Math.min(typeof window !== 'undefined' ? window.innerWidth - 32 : 800, 800)}
             loading={
               <div className="pdf-viewer__loading">
                 <Loader size={20} className="pdf-viewer__spinner" />

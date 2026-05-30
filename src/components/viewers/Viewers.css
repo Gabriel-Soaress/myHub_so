@@ -86,21 +86,23 @@
   display: flex;
   justify-content: center;
   padding: var(--space-4);
-  overflow-x: auto;
   width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
 }
 
 .pdf-viewer__document .react-pdf__Document {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 100%;
 }
 
 .pdf-viewer__document .react-pdf__Page {
   box-shadow: var(--shadow-lg);
   border-radius: var(--radius-sm);
   overflow: hidden;
-  max-width: 100%;
+  max-width: 100% !important;
 }
 
 .pdf-viewer__document .react-pdf__Page canvas {

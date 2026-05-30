@@ -79,6 +79,12 @@ function FileUploader() {
   const handleUpload = async () => {
     if (!file || !name.trim()) return;
 
+    // Vercel serverless limits request body to ~4.5MB
+    if (file.size > 4.5 * 1024 * 1024) {
+      alert("O arquivo é muito grande. O limite máximo é de 4.5MB para esta plataforma.");
+      return;
+    }
+
     setUploading(true);
     try {
       const base64Data = await fileToBase64(file);
