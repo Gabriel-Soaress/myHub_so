@@ -123,7 +123,7 @@ export async function updateNode(id, updates) {
   };
   
   try {
-    await fetch(`/api/nodes/${id}?tenant=${activeTenant}`, {
+    await fetch(`/api/node?id=${id}&tenant=${activeTenant}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates)
@@ -149,7 +149,7 @@ export async function deleteNodeRecursive(id) {
   memoryTree = memoryTree.filter((n) => !idsToRemove.has(n.id));
   
   try {
-    await fetch(`/api/nodes/${id}?tenant=${activeTenant}`, { method: 'DELETE' });
+    await fetch(`/api/node?id=${id}&tenant=${activeTenant}`, { method: 'DELETE' });
   } catch (err) {
     console.error('Failed to delete node in DB', err);
   }
@@ -191,7 +191,7 @@ export function countByType() {
 
 export async function saveFile(nodeId, base64Data) {
   try {
-    await fetch(`/api/files/${nodeId}?tenant=${activeTenant}`, {
+    await fetch(`/api/file?nodeId=${nodeId}&tenant=${activeTenant}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: base64Data })
@@ -203,7 +203,7 @@ export async function saveFile(nodeId, base64Data) {
 
 export async function getFile(nodeId) {
   try {
-    const res = await fetch(`/api/files/${nodeId}?tenant=${activeTenant}`);
+    const res = await fetch(`/api/file?nodeId=${nodeId}&tenant=${activeTenant}`);
     if (res.ok) {
       const json = await res.json();
       return json.data;

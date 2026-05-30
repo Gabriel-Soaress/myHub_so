@@ -1,21 +1,20 @@
-import { getDb } from './api/db.js';
-
-async function test() {
-  const sql = getDb();
+async function run() {
+  const id = '123e4567-e89b-12d3-a456-426614174000';
   
-  const uuid = crypto.randomUUID();
-  try {
-    const obj = {};
-    const metadata = undefined;
-    
-    // Testing what actually gets sent
-    await sql`
-      INSERT INTO nodes (id, user_slug, parent_id, name, type, metadata, content, item_order)
-      VALUES (${uuid}, ${'gabriel'}, null, ${'test folder'}, ${'folder'}, ${metadata || '{}'}, ${'{}'}, 0)
-    `;
-    console.log('Success object');
-  } catch (e) {
-    console.error('Error object:', e.message);
-  }
+  // Test 1: Node
+  const resNode = await fetch('https://my-hub-so.vercel.app/api/nodes?tenant=teste', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, type: 'folder', name: 'test' })
+  });
+  console.log('Node res:', resNode.status, await resNode.text());
+
+  // Test 2: File
+  const resFile = await fetch(`https://my-hub-so.vercel.app/api/files/${id}?tenant=teste`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: 'data:text/plain;base64,SGVsbG8=' })
+  });
+  console.log('File res:', resFile.status, await resFile.text());
 }
-test();
+run();
