@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router';
 import { ChevronRight, Folder, X, ArrowLeft } from 'lucide-react';
 import { getChildren, getAncestors } from '../../services/storageService';
 import useUIStore from '../../store/useUIStore';
+import useAuthStore from '../../store/useAuthStore';
 import './Layout.css';
 
 function SidebarItem({ node, activeId, level = 0 }) {
