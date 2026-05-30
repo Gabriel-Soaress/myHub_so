@@ -103,14 +103,29 @@ function Header() {
             </button>
           </div>
         ) : (
-          <button
-            className="header__icon-btn"
-            onClick={openLoginModal}
-            aria-label="Entrar como administrador"
-            title="Entrar como administrador"
-          >
-            <Lock size={18} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button
+              onClick={() => window.open('/', '_blank')}
+              style={{
+                background: 'var(--primary-600)', color: 'white', padding: '0.4rem 0.75rem',
+                borderRadius: 'var(--radius-full)', border: 'none', fontSize: '13px',
+                fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s',
+                display: 'flex', alignItems: 'center', gap: '0.35rem'
+              }}
+              title="Crie seu próprio portfólio"
+            >
+              <Layout size={14} />
+              <span className="hide-on-mobile">Criar Portfólio</span>
+            </button>
+            <button
+              className="header__icon-btn"
+              onClick={openLoginModal}
+              aria-label="Entrar como administrador"
+              title="Entrar como administrador"
+            >
+              <Lock size={18} />
+            </button>
+          </div>
         )}
       </div>
     </header>

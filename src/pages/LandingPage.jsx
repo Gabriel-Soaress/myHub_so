@@ -86,7 +86,7 @@ function LandingPage() {
           </div>
         )}
 
-        <div className="landing__cta animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+        <div className="landing__cta animate-fade-in-up" style={{ animationDelay: '0.6s', display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <Button
             variant="primary"
             size="lg"
@@ -94,6 +94,14 @@ function LandingPage() {
             onClick={() => navigate(`/${activeSlug}/explorar`)}
           >
             Explorar Portfólio
+          </Button>
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={() => window.open('/', '_blank')}
+            style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'white', borderColor: 'rgba(255,255,255,0.2)' }}
+          >
+            Crie seu Portfólio
           </Button>
         </div>
       </main>
