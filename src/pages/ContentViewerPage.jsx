@@ -190,7 +190,7 @@ function ContentViewerPage() {
         </div>
 
         <div className="content-viewer__actions" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-          {contentType === 'richtext' && (
+          {contentType === 'richtext' && !node.metadata?.downloadBlocked && (
             <>
               <Button variant="secondary" size="sm" icon={Download} onClick={() => exportHtmlToPdf('richtext-export-area', node.name)}>
                 Exportar PDF

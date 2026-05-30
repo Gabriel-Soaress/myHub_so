@@ -47,7 +47,7 @@ async function collectFilesRecursive(folderId, currentPath, zipData) {
       }
       else {
         // Arquivo binário (PDF, Imagem, Download)
-        const base64 = getFile(child.id);
+        const base64 = await getFile(child.id);
         if (base64) {
           const parts = base64.split(',');
           if (parts.length > 1) {
@@ -71,17 +71,20 @@ async function collectFilesRecursive(folderId, currentPath, zipData) {
  * Baixa uma pasta inteira como ZIP
  */
 export async function downloadFolderAsZip(folderNode) {
-  if (folderNode.metadata?.downloadBlocked) {
+  if (folderNode?.metadata?.downloadBlocked) {
     alert('Download bloqueado pelo administrador.');
     return;
   }
 
   const zipData = {};
-  await collectFilesRecursive(folderNode.id, folderNode.name, zipData);
+  const folderId = folderNode ? folderNode.id : null;
+  const folderName = folderNode ? folderNode.name : 'Meu Portfólio';
+  
+  await collectFilesRecursive(folderId, folderName, zipData);
   
   const zipped = zipSync(zipData);
   const blob = new Blob([zipped], { type: 'application/zip' });
-  saveAs(blob, `${folderNode.name}.zip`);
+  saveAs(blob, `${folderName}.zip`);
 }
 
 /**

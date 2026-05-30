@@ -44,14 +44,20 @@ function FileDownload({ nodeId, node }) {
           </div>
         </div>
 
-        <button
-          type="button"
-          className="file-download__btn"
-          onClick={handleDownload}
-        >
-          <FileDown size={18} />
-          Baixar Arquivo
-        </button>
+        {!node?.metadata?.downloadBlocked ? (
+          <button
+            type="button"
+            className="file-download__btn"
+            onClick={handleDownload}
+          >
+            <FileDown size={18} />
+            Baixar Arquivo
+          </button>
+        ) : (
+          <div style={{ marginTop: '1.5rem', color: 'var(--gray-500)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
+            <FileDown size={18} /> Download Bloqueado
+          </div>
+        )}
       </div>
     </div>
   );

@@ -142,14 +142,14 @@ function ExplorerPage() {
         {/* Admin Toolbar & Actions */}
         {!isSearching && (
           <div className="explorer-page__toolbar">
-            {currentNode && !currentNode.metadata?.downloadBlocked && (
+            {(!currentNode || !currentNode.metadata?.downloadBlocked) && (
               <Button
                 variant="secondary"
                 size="sm"
                 icon={Download}
                 onClick={() => downloadFolderAsZip(currentNode)}
               >
-                Baixar Pasta
+                {currentNode ? 'Baixar Pasta' : 'Baixar Tudo'}
               </Button>
             )}
 
