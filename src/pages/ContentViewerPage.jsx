@@ -14,7 +14,8 @@ import {
   Lock,
   Download,
   ChevronLeft,
-  MoveRight
+  MoveRight,
+  Video
 } from 'lucide-react';
 import { getNodeById, getFile, isNodeLockedCascading, updateNode, deleteNodeRecursive } from '../services/storageService';
 import { exportHtmlToPdf, exportHtmlToDocx } from '../services/exportService';
@@ -183,7 +184,7 @@ function ContentViewerPage() {
     richtext: FileText,
     pdf: FileText,
     image: Image,
-    video: FileDown, /* Can use a better icon if imported, but using FileDown as fallback */
+    video: Video,
     download: FileDown,
     code: FileCode,
     docx: FileText

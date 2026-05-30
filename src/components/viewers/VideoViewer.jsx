@@ -11,9 +11,11 @@ function VideoViewer({ nodeId, name, fileData }) {
   }
 
   return (
-    <div className="viewer-video" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+    <div className="viewer-video" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', width: '100%' }}>
       <video 
         controls 
+        playsInline
+        preload="metadata"
         src={fileData} 
         style={{ 
           maxWidth: '100%', 

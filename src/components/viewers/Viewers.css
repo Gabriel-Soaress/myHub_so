@@ -100,6 +100,12 @@
   box-shadow: var(--shadow-lg);
   border-radius: var(--radius-sm);
   overflow: hidden;
+  max-width: 100%;
+}
+
+.pdf-viewer__document .react-pdf__Page canvas {
+  max-width: 100% !important;
+  height: auto !important;
 }
 
 .pdf-viewer__loading {

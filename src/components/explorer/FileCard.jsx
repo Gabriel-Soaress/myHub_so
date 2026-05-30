@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { FileText, Image, FileDown, File, Pencil, Trash2, FileCode, Lock, MoveRight, Download } from 'lucide-react';
+import { FileText, Image, FileDown, File, Pencil, Trash2, FileCode, Lock, MoveRight, Download, Video } from 'lucide-react';
 import useAuthStore from '../../store/useAuthStore';
 import useUIStore from '../../store/useUIStore';
 import { formatDateShort } from '../../utils/helpers';
@@ -11,6 +11,7 @@ const TYPE_ICONS = {
   pdf: FileText,
   docx: FileText,
   image: Image,
+  video: Video,
   gallery: Image,
   download: FileDown,
   code: FileCode,
@@ -20,6 +21,7 @@ const TYPE_COLORS = {
   richtext: 'var(--primary-500)',
   pdf: '#ef4444',
   image: '#10b981',
+  video: '#8b5cf6',
   gallery: '#f59e0b',
   download: 'var(--gray-500)',
 };
