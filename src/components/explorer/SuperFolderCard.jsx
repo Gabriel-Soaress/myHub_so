@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { Folder, Pencil, Trash2, Download, Lock } from 'lucide-react';
+import { Folder, Pencil, Trash2, Download, Lock, MoveRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getChildren } from '../../services/storageService';
 import { downloadFolderAsZip } from '../../services/exportService';
@@ -66,10 +66,23 @@ function SuperFolderCard({ node }) {
         </div>
         
         <div className="super-folder-card__actions" onClick={(e) => e.stopPropagation()}>
-          {!node.metadata?.downloadBlocked && !node.metadata?.password && (
+          {!node.metadata?.downloadBlocked && (
             <button
               className="folder-card__action-btn"
-              onClick={() => downloadFolderAsZip(node)}
+              onClick={(e) => {
+                e.stopPropagation();
+                const unlockedNodes = useAuthStore.getState().unlockedNodes;
+                const unlockNode = useAuthStore.getState().unlockNode;
+                if (!isAuthenticated && node.metadata?.password && !unlockedNodes.includes(node.id)) {
+                  const pass = window.prompt("Este item é protegido por senha. Digite a senha para baixar:");
+                  if (pass !== node.metadata.password) {
+                    alert("Senha incorreta.");
+                    return;
+                  }
+                  unlockNode(node.id);
+                }
+                downloadFolderAsZip(node);
+              }}
               aria-label="Baixar pasta em ZIP"
               title="Baixar em ZIP"
               style={{ backgroundColor: 'white' }}
@@ -79,10 +92,13 @@ function SuperFolderCard({ node }) {
           )}
           {isAuthenticated && (
             <>
-              <button className="folder-card__action-btn" onClick={handleEdit} title="Editar" style={{ backgroundColor: 'white' }}>
+              <button className="folder-card__action-btn" onClick={(e) => { e.stopPropagation(); openModal('move', node); }} title="Mover" style={{ backgroundColor: 'white' }}>
+                <MoveRight size={14} />
+              </button>
+              <button className="folder-card__action-btn" onClick={(e) => { e.stopPropagation(); handleEdit(e); }} title="Editar" style={{ backgroundColor: 'white' }}>
                 <Pencil size={14} />
               </button>
-              <button className="folder-card__action-btn folder-card__action-btn--danger" onClick={handleDelete} title="Excluir" style={{ backgroundColor: 'white' }}>
+              <button className="folder-card__action-btn folder-card__action-btn--danger" onClick={(e) => { e.stopPropagation(); handleDelete(e); }} title="Excluir" style={{ backgroundColor: 'white' }}>
                 <Trash2 size={14} />
               </button>
             </>

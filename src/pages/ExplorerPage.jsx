@@ -142,7 +142,7 @@ function ExplorerPage() {
         {/* Admin Toolbar & Actions */}
         {!isSearching && (
           <div className="explorer-page__toolbar">
-            {(!currentNode || !currentNode.metadata?.downloadBlocked) && (
+            {(currentNode ? !currentNode.metadata?.downloadBlocked : isAuthenticated) && (
               <Button
                 variant="secondary"
                 size="sm"
