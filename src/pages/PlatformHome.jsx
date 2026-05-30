@@ -95,7 +95,7 @@ function PlatformHome() {
         }}>
           
           {/* Left Column: Hero Text */}
-          <div className="animate-fade-in-up" style={{ paddingRight: '2rem' }}>
+          <div className="animate-fade-in-up hero-text-col">
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem 1rem', borderRadius: '999px', color: '#e2e8f0', marginBottom: '2rem', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.05)' }}>
               <Sparkles size={16} color="#818cf8" />
               <span style={{ fontSize: '0.875rem', fontWeight: '500', letterSpacing: '0.5px' }}>Plataforma SaaS Premium</span>
@@ -259,6 +259,9 @@ function PlatformHome() {
       </main>
       
       <style dangerouslySetInnerHTML={{__html: `
+        .hero-text-col {
+          padding-right: 2rem;
+        }
         input:focus {
           border-color: #818cf8 !important;
           box-shadow: 0 0 0 1px #818cf8 !important;
@@ -267,6 +270,20 @@ function PlatformHome() {
           main > div {
             grid-template-columns: 1fr !important;
             gap: 2rem !important;
+          }
+          .hero-text-col {
+            padding-right: 0 !important;
+          }
+        }
+        @media (max-width: 600px) {
+          h1 {
+            font-size: 2.5rem !important;
+          }
+          main {
+            padding: 1rem !important;
+          }
+          .animate-fade-in-up > div:last-child {
+            padding: 1.5rem !important;
           }
         }
       `}} />

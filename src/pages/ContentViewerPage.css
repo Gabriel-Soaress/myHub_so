@@ -4,6 +4,8 @@
 
 .content-viewer {
   max-width: var(--content-max-width);
+  width: 100%;
+  overflow-x: hidden;
   animation: fadeIn var(--transition-slow) ease;
 }
 

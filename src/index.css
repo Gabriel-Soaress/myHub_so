@@ -303,9 +303,12 @@ input, textarea, select {
 /* --- Rich Text Content Styling --- */
 .prose {
   max-width: var(--reader-max-width);
+  width: 100%;
   line-height: var(--line-height-relaxed);
   color: var(--text-primary);
   font-size: var(--font-size-base);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .prose h1 {

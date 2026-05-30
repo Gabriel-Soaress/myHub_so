@@ -30,6 +30,7 @@ import ImageViewer from '../components/viewers/ImageViewer';
 import FileDownload from '../components/viewers/FileDownload';
 import CodeViewer from '../components/viewers/CodeViewer';
 import DocxViewer from '../components/viewers/DocxViewer';
+import VideoViewer from '../components/viewers/VideoViewer';
 import RichTextEditorInline from '../components/admin/RichTextEditorInline';
 
 import './ContentViewerPage.css';
@@ -182,6 +183,7 @@ function ContentViewerPage() {
     richtext: FileText,
     pdf: FileText,
     image: Image,
+    video: FileDown, /* Can use a better icon if imported, but using FileDown as fallback */
     download: FileDown,
     code: FileCode,
     docx: FileText
@@ -287,6 +289,7 @@ function ContentViewerPage() {
               {contentType === 'richtext' && <RichTextViewer content={node.content?.body} />}
               {contentType === 'pdf' && <PdfViewer nodeId={nodeId} />}
               {contentType === 'image' && <ImageViewer nodeId={nodeId} name={node.name} />}
+              {contentType === 'video' && <VideoViewer nodeId={nodeId} name={node.name} fileData={fileData} />}
               {contentType === 'code' && <CodeViewer nodeId={nodeId} node={node} />}
               {contentType === 'docx' && <DocxViewer nodeId={nodeId} node={node} />}
               {(contentType === 'download' || contentType === 'gallery') && (
