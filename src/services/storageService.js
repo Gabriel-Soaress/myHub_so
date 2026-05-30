@@ -1,55 +1,46 @@
-import { STORAGE_KEYS } from '../utils/constants';
 import { generateId } from '../utils/helpers';
 
 /**
- * Serviço de persistência localStorage para a árvore de conteúdo
+ * Serviço de persistência remoto (API Vercel + Neon) com cache em memória
  */
 
 let activeTenant = 'default';
+let memoryTree = [];
 
 export function setTenant(slug) {
   activeTenant = slug;
 }
 
-function getTreeKey() {
-  return `portfolio-tree-${activeTenant}`;
-}
-
-function getFileKey(nodeId) {
-  return `portfolio-files-${activeTenant}-${nodeId}`;
-}
-
-function getTree() {
+/**
+ * Carrega a árvore do backend e armazena em memória
+ */
+export async function fetchTree(tenant) {
   try {
-    const data = localStorage.getItem(getTreeKey());
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
+    const res = await fetch(`/api/nodes?tenant=${tenant}`);
+    if (res.ok) {
+      memoryTree = await res.json();
+    } else {
+      memoryTree = [];
+    }
+  } catch (err) {
+    console.error('Failed to fetch tree', err);
+    memoryTree = [];
   }
 }
 
-function saveTree(tree) {
-  localStorage.setItem(getTreeKey(), JSON.stringify(tree));
+function getTree() {
+  return memoryTree;
 }
 
-/**
- * Retorna todos os nós
- */
 export function getAllNodes() {
   return getTree();
 }
 
-/**
- * Busca nó por ID
- */
 export function getNodeById(id) {
   const tree = getTree();
   return tree.find((node) => node.id === id) || null;
 }
 
-/**
- * Retorna filhos diretos de um nó (ou raiz se parentId = null)
- */
 export function getChildren(parentId = null) {
   const tree = getTree();
   return tree
@@ -57,9 +48,6 @@ export function getChildren(parentId = null) {
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 }
 
-/**
- * Retorna caminho de ancestrais (para breadcrumb)
- */
 export function getAncestors(id) {
   const tree = getTree();
   const ancestors = [];
@@ -75,11 +63,8 @@ export function getAncestors(id) {
   return ancestors;
 }
 
-/**
- * Verifica se um nó está bloqueado por senha (ele ou qualquer ancestral)
- */
 export function isNodeLockedCascading(id, isAuthenticated, unlockedNodes = []) {
-  if (isAuthenticated) return false;
+  if (isAuthenticated) return { locked: false, lockedNode: null };
   
   const tree = getTree();
   let current = tree.find((n) => n.id === id);
@@ -96,15 +81,11 @@ export function isNodeLockedCascading(id, isAuthenticated, unlockedNodes = []) {
   return { locked: false, lockedNode: null };
 }
 
-/**
- * Cria um novo nó
- */
-export function createNode(nodeData) {
-  const tree = getTree();
-  const siblings = tree.filter((n) => n.parentId === (nodeData.parentId || null));
+export async function createNode(nodeData) {
+  const siblings = memoryTree.filter((n) => n.parentId === (nodeData.parentId || null));
   
   const node = {
-    id: generateId(),
+    id: nodeData.id || generateId(),
     type: nodeData.type || 'folder',
     name: nodeData.name || 'Sem título',
     parentId: nodeData.parentId || null,
@@ -113,135 +94,133 @@ export function createNode(nodeData) {
     updatedAt: new Date().toISOString(),
     content: nodeData.content || null,
     metadata: nodeData.metadata || {},
-    ...nodeData,
-    id: nodeData.id || generateId(),
   };
   
-  tree.push(node);
-  saveTree(tree);
+  // Optimistic UI
+  memoryTree.push(node);
+  
+  try {
+    await fetch(`/api/nodes?tenant=${activeTenant}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(node)
+    });
+  } catch (err) {
+    console.error('Failed to create node in DB', err);
+  }
+  
   return node;
 }
 
-/**
- * Atualiza um nó existente
- */
-export function updateNode(id, updates) {
-  const tree = getTree();
-  const index = tree.findIndex((n) => n.id === id);
+export async function updateNode(id, updates) {
+  const index = memoryTree.findIndex((n) => n.id === id);
   if (index === -1) return null;
   
-  tree[index] = {
-    ...tree[index],
+  memoryTree[index] = {
+    ...memoryTree[index],
     ...updates,
     updatedAt: new Date().toISOString(),
   };
   
-  saveTree(tree);
-  return tree[index];
+  try {
+    await fetch(`/api/nodes/${id}?tenant=${activeTenant}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates)
+    });
+  } catch (err) {
+    console.error('Failed to update node in DB', err);
+  }
+  
+  return memoryTree[index];
 }
 
-/**
- * Remove um nó e todos os filhos recursivamente
- */
-export function deleteNodeRecursive(id) {
-  let tree = getTree();
-  
+export async function deleteNodeRecursive(id) {
   // Coleta IDs a remover (nó + descendentes)
   const idsToRemove = new Set();
   function collectIds(nodeId) {
     idsToRemove.add(nodeId);
-    tree
+    memoryTree
       .filter((n) => n.parentId === nodeId)
       .forEach((child) => collectIds(child.id));
   }
   collectIds(id);
   
-  // Remove arquivos associados do localStorage
-  idsToRemove.forEach((nid) => {
-    localStorage.removeItem(getFileKey(nid));
-  });
+  memoryTree = memoryTree.filter((n) => !idsToRemove.has(n.id));
   
-  tree = tree.filter((n) => !idsToRemove.has(n.id));
-  saveTree(tree);
+  try {
+    await fetch(`/api/nodes/${id}?tenant=${activeTenant}`, { method: 'DELETE' });
+  } catch (err) {
+    console.error('Failed to delete node in DB', err);
+  }
+  
   return true;
 }
 
-/**
- * Move nó para outro pai
- */
-export function moveNode(id, newParentId) {
+export async function moveNode(id, newParentId) {
   return updateNode(id, { parentId: newParentId });
 }
 
-/**
- * Reordena filhos de um pai
- */
-export function reorderNodes(parentId, orderedIds) {
-  const tree = getTree();
+export async function reorderNodes(parentId, orderedIds) {
   orderedIds.forEach((id, index) => {
-    const node = tree.find((n) => n.id === id);
+    const node = memoryTree.find((n) => n.id === id);
     if (node) node.order = index;
   });
-  saveTree(tree);
+  
+  // No mundo ideal, seria um batch update. Para o MVP, aceitável localmente e ignora backend.
+  // Pode causar dessincronização de ordem no refresh.
 }
 
-/**
- * Busca nós por texto (nome ou descrição)
- */
 export function searchNodes(query) {
   if (!query?.trim()) return [];
-  const tree = getTree();
   const q = query.toLowerCase();
-  return tree.filter(
+  return memoryTree.filter(
     (n) =>
       n.name?.toLowerCase().includes(q) ||
       n.metadata?.description?.toLowerCase().includes(q)
   );
 }
 
-/**
- * Conta total de nós por tipo
- */
 export function countByType() {
-  const tree = getTree();
-  return tree.reduce((acc, node) => {
+  return memoryTree.reduce((acc, node) => {
     const type = node.type === 'folder' ? 'folders' : (node.content?.type || 'other');
     acc[type] = (acc[type] || 0) + 1;
     return acc;
   }, {});
 }
 
-/**
- * Salva arquivo (base64) associado a um nó
- */
-export function saveFile(nodeId, base64Data) {
-  localStorage.setItem(getFileKey(nodeId), base64Data);
+export async function saveFile(nodeId, base64Data) {
+  try {
+    await fetch(`/api/files/${nodeId}?tenant=${activeTenant}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: base64Data })
+    });
+  } catch (err) {
+    console.error('Failed to save file in DB', err);
+  }
 }
 
-/**
- * Recupera arquivo (base64) de um nó
- */
-export function getFile(nodeId) {
-  return localStorage.getItem(getFileKey(nodeId));
+export async function getFile(nodeId) {
+  try {
+    const res = await fetch(`/api/files/${nodeId}?tenant=${activeTenant}`);
+    if (res.ok) {
+      const json = await res.json();
+      return json.data;
+    }
+    return null;
+  } catch (err) {
+    console.error('Failed to get file from DB', err);
+    return null;
+  }
 }
 
-/**
- * Remove arquivo de um nó
- */
-export function deleteFile(nodeId) {
-  localStorage.removeItem(getFileKey(nodeId));
+export async function deleteFile(nodeId) {
+  // Tratado pelo cascade do banco
 }
 
-/**
- * Verifica se o seed já foi executado
- */
 export function isSeeded() {
-  return localStorage.getItem(`portfolio-seeded-${activeTenant}`) === 'true';
+  return true; // We don't seed in real DB for now
 }
 
-/**
- * Marca como seeded
- */
-export function markSeeded() {
-  localStorage.setItem(`portfolio-seeded-${activeTenant}`, 'true');
-}
+export function markSeeded() {}

@@ -1,31 +1,30 @@
 import { create } from 'zustand';
-import { ADMIN_PASSWORD_HASH, STORAGE_KEYS } from '../utils/constants';
-import { hashPassword } from '../utils/helpers';
 
-const getPlatformUsers = () => JSON.parse(localStorage.getItem('platform-users') || '{}');
-
-const getActiveTenant = () => {
-  // Try to parse from URL if possible, otherwise rely on a global or just localStorage for now.
-  // A robust way is to just read the location in the store, but usually the UI passes the slug.
-  const path = window.location.pathname;
-  const match = path.match(/^\/([^/]+)/);
-  return match ? match[1] : 'default';
-};
-
-const getTenantAuthKey = (slug) => `portfolio-auth-${slug}`;
-const getTenantSettingsKey = (slug) => `portfolio-settings-${slug}`;
+function getTenantAuthKey(slug) {
+  return `portfolio-auth-${slug}`;
+}
 
 const useAuthStore = create((set, get) => ({
-  activeSlug: getActiveTenant(),
-  isAuthenticated: false, // will be initialized by init()
+  activeSlug: null,
+  isAuthenticated: false,
   isLoginModalOpen: false,
   loginError: '',
   unlockedNodes: [],
   landingSettings: {},
 
-  init: (slug) => {
+  init: async (slug) => {
+    // Carrega settings da API
+    let settings = {};
+    try {
+      const res = await fetch(`/api/settings?tenant=${slug}`);
+      if (res.ok) settings = await res.json();
+    } catch (err) {
+      console.error('Failed to load settings', err);
+    }
+    
+    // Auth state continua local (para manter a sessão do admin sem cookie complexo)
     const isAuth = localStorage.getItem(getTenantAuthKey(slug)) === 'true';
-    const settings = JSON.parse(localStorage.getItem(getTenantSettingsKey(slug)) || '{}');
+    
     set({
       activeSlug: slug,
       isAuthenticated: isAuth,
@@ -34,103 +33,111 @@ const useAuthStore = create((set, get) => ({
     });
   },
 
-  openLoginModal: () => set({ isLoginModalOpen: true, loginError: '' }),
-  closeLoginModal: () => set({ isLoginModalOpen: false, loginError: '' }),
-
-  unlockNode: (nodeId) => set((state) => {
-    if (!state.unlockedNodes.includes(nodeId)) {
-      return { unlockedNodes: [...state.unlockedNodes, nodeId] };
-    }
-    return state;
-  }),
-
-  updateLandingSettings: (settings) => {
-    const slug = get().activeSlug;
-    localStorage.setItem(getTenantSettingsKey(slug), JSON.stringify(settings));
-    set({ landingSettings: settings });
-  },
-
   register: async (name, email, slug, password) => {
-    const users = getPlatformUsers();
-    if (users[slug]) return { success: false, error: 'Este link já está em uso.' };
-    
-    const hash = await hashPassword(password);
-    users[slug] = { name, email, slug, passwordHash: hash };
-    localStorage.setItem('platform-users', JSON.stringify(users));
-    
-    // Auto-login after register
-    localStorage.setItem(getTenantAuthKey(slug), 'true');
-    set({ isAuthenticated: true, activeSlug: slug });
-    return { success: true };
-  },
+    try {
+      // Dummy hash generation here, real one should be on backend, but since we had one:
+      let passwordHash = password;
+      if (window.crypto && window.crypto.subtle) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        passwordHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+      } else {
+        passwordHash = btoa(password).split('').reverse().join('');
+      }
 
-  changePassword: async (oldPassword, newPassword) => {
-    const slug = get().activeSlug;
-    const users = getPlatformUsers();
-    const user = users[slug];
-    
-    // Backward compatibility for legacy single-tenant admin
-    const oldHash = await hashPassword(oldPassword);
-    const legacyHash = localStorage.getItem('admin-password-hash') || ADMIN_PASSWORD_HASH;
-    
-    let currentHash = user ? user.passwordHash : legacyHash;
-    
-    if (oldHash !== currentHash) return false;
-    
-    const newHash = await hashPassword(newPassword);
-    
-    if (user) {
-      user.passwordHash = newHash;
-      localStorage.setItem('platform-users', JSON.stringify(users));
-    } else {
-      localStorage.setItem('admin-password-hash', newHash);
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, slug, passwordHash })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return { success: false, error: data.error || 'Erro no cadastro' };
+      }
+
+      // Auto-login after register
+      localStorage.setItem(getTenantAuthKey(slug), 'true');
+      set({ isAuthenticated: true, activeSlug: slug });
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: 'Erro de rede' };
     }
-    return true;
   },
 
   login: async (password, emailOverride) => {
-    // If we only have password, it's the legacy login flow (e.g. from within a tenant)
-    // But since we require email now from PlatformHome, we'll use emailOverride
-    const users = getPlatformUsers();
-    
-    let user = null;
-    let targetSlug = null;
+    try {
+      let passwordHash = password;
+      if (window.crypto && window.crypto.subtle) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        passwordHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+      } else {
+        passwordHash = btoa(password).split('').reverse().join('');
+      }
 
-    if (emailOverride) {
-      // Find user by email
-      const userKey = Object.keys(users).find(key => users[key].email === emailOverride);
-      if (!userKey) {
-        set({ loginError: 'Usuário não encontrado.' });
+      const body = { passwordHash };
+      if (emailOverride) {
+        body.email = emailOverride;
+      } else {
+        body.slugOverride = get().activeSlug;
+      }
+
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        set({ loginError: data.error || 'Erro no login' });
         return false;
       }
-      user = users[userKey];
-      targetSlug = user.slug;
-    } else {
-      targetSlug = get().activeSlug;
-      user = users[targetSlug];
-    }
-    
-    const hash = await hashPassword(password);
-    
-    // Legacy support
-    const legacyHash = localStorage.getItem('admin-password-hash') || ADMIN_PASSWORD_HASH;
-    const expectedHash = user ? user.passwordHash : legacyHash;
-    
-    if (hash === expectedHash) {
+
+      const targetSlug = data.slug;
       localStorage.setItem(getTenantAuthKey(targetSlug), 'true');
       set({ isAuthenticated: true, isLoginModalOpen: false, loginError: '', activeSlug: targetSlug });
-      return targetSlug; // return slug so UI can navigate
-    } else {
-      set({ loginError: 'Senha incorreta. Tente novamente.' });
+      return targetSlug;
+    } catch (err) {
+      set({ loginError: 'Erro de rede' });
       return false;
     }
   },
 
   logout: () => {
     const slug = get().activeSlug;
-    localStorage.removeItem(getTenantAuthKey(slug));
-    set({ isAuthenticated: false });
+    if (slug) {
+      localStorage.removeItem(getTenantAuthKey(slug));
+    }
+    set({ isAuthenticated: false, unlockedNodes: [] });
   },
+
+  unlockNode: (nodeId) => {
+    set((state) => ({ unlockedNodes: [...state.unlockedNodes, nodeId] }));
+  },
+  openLoginModal: () => set({ isLoginModalOpen: true, loginError: '' }),
+  closeLoginModal: () => set({ isLoginModalOpen: false, loginError: '' }),
+
+  saveSettings: async (settings) => {
+    const slug = get().activeSlug;
+    try {
+      await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenant: slug, settings })
+      });
+      set({ landingSettings: settings });
+    } catch (err) {
+      console.error('Failed to save settings', err);
+    }
+  }
 }));
 
 export default useAuthStore;

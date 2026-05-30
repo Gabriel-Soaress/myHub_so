@@ -10,26 +10,24 @@ function TenantLayout() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // 1. Check if slug exists in platform-users
-    const users = JSON.parse(localStorage.getItem('platform-users') || '{}');
-    
-    // For local dev / legacy mode: if no users exist at all, we might allow 'default' or similar
-    // But in strict mode, if slug is not in users, redirect to platform home
-    if (!users[slug] && slug !== 'admin' && slug !== 'default') {
-      navigate('/');
-      return;
+    async function loadTenant() {
+      // Set active tenant so all API calls use it
+      setTenant(slug);
+
+      // Fetch the node tree from the Vercel API and load it into memory
+      // We import fetchTree from storageService
+      const { fetchTree } = await import('../../services/storageService');
+      await fetchTree(slug);
+
+      // Initialize auth store (loads settings and restores auth)
+      await initAuth(slug);
+      
+      setIsReady(true);
     }
-
-    // 2. Set the active tenant in storageService
-    setTenant(slug);
-
-    // 3. Initialize auth store for this tenant (loads auth state and settings)
-    initAuth(slug);
     
-    // 4. Mark as ready so children can render with correct tenant data
-    setIsReady(true);
-
-  }, [slug, navigate, initAuth]);
+    setIsReady(false);
+    loadTenant();
+  }, [slug, initAuth]);
 
   // Wait for initialization before rendering
   if (!isReady) return null;
