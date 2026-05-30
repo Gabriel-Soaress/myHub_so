@@ -110,7 +110,7 @@ function SettingsModal() {
             />
           </div>
           <div className="admin-form__group">
-            <label className="admin-form__label">Subtítulo (Disciplina)</label>
+            <label className="admin-form__label">Subtítulo (Nome)</label>
             <input 
               type="text" 
               className="admin-form__input" 

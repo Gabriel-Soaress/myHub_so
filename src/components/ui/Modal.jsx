@@ -24,7 +24,12 @@ function Modal({ isOpen, onClose, title, children, size = 'md' }) {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div 
+      className="modal-overlay" 
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
         className={`modal modal--${size}`}
         onClick={(e) => e.stopPropagation()}
