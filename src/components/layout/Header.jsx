@@ -68,14 +68,14 @@ function Header() {
           }}
         >
           <Share2 size={16} />
-          Compartilhar
+          <span className="hide-on-mobile">Compartilhar</span>
         </button>
         <SearchBar />
         {isAuthenticated ? (
           <div className="header__admin-group">
             <span className="header__admin-badge">
               <ShieldCheck size={14} />
-              Admin
+              <span className="hide-on-mobile">Admin</span>
             </span>
             <button
               className="header__icon-btn"
