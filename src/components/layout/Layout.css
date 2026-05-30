@@ -322,12 +322,8 @@
 
 /* --- Responsive --- */
 @media (max-width: 768px) {
-  .header__logo-text {
-    display: none;
-  }
-
   .hide-on-mobile {
-    display: none;
+    display: none !important;
   }
 
   .header__center {
@@ -343,12 +339,14 @@
   }
 
   .sidebar {
-    transform: translateX(calc(-1 * var(--sidebar-width)));
+    left: auto;
+    right: 0;
+    transform: translateX(100%);
   }
 
   .sidebar--mobile-open {
     transform: translateX(0);
-    box-shadow: var(--shadow-xl);
+    box-shadow: -5px 0 25px rgba(0,0,0,0.1);
     top: 0;
     z-index: var(--z-modal);
   }
