@@ -1,5 +1,5 @@
 // Constantes do sistema
-export const APP_NAME = 'Portfólio Reflexivo';
+export const APP_NAME = 'myHubSo';
 export const STUDENT_NAME = 'Gabriel';
 export const COURSE_NAME = 'Engenharia de Software';
 export const INSTITUTION_NAME = 'Universidade';

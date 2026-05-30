@@ -49,7 +49,7 @@ function Header() {
       </div>
 
       <div className="header__center">
-        {/* Vazio no centro ou pode adicionar algo no futuro */}
+        <SearchBar />
       </div>
 
       <div className="header__right">
@@ -70,7 +70,6 @@ function Header() {
           <Share2 size={16} />
           <span className="hide-on-mobile">Compartilhar</span>
         </button>
-        <SearchBar />
         {isAuthenticated ? (
           <div className="header__admin-group">
             <span className="header__admin-badge">

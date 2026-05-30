@@ -400,3 +400,8 @@ input, textarea, select {
 
 .ProseMirror-selectednode { outline: 2px solid var(--primary-500); border-radius: var(--radius-sm); }
 
+@media (max-width: 768px) {
+  :root {
+    --header-height: 110px;
+  }
+}
