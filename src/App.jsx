@@ -28,7 +28,7 @@ function AppLayout({ children }) {
   // Responsividade
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 768) {
+      if (window.innerWidth >= 768) {
         setSidebarMobile(false);
       }
     };

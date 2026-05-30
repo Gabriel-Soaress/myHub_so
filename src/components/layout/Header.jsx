@@ -33,16 +33,9 @@ function Header() {
   return (
     <header className="header">
       <div className="header__left">
-        <button
-          className="header__menu-btn"
-          onClick={handleMenuClick}
-          aria-label="Alternar menu lateral"
-        >
-          <Menu size={20} />
-        </button>
         <Link to={`/${activeSlug}`} className="header__brand" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-          <div className="header__logo">
-            <AlignLeft size={20} color="var(--primary-600)" />
+          <div className="header__logo" style={{ background: 'var(--primary-600)', borderRadius: '6px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <AlignLeft size={16} color="white" strokeWidth={2.5} />
           </div>
           <span className="header__logo-text" style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--text-primary)' }}>{APP_NAME}</span>
         </Link>
@@ -120,6 +113,14 @@ function Header() {
             </div>
           )}
         </div>
+        <button
+          className="header__menu-btn"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: 'var(--radius-sm)', color: 'var(--text-secondary)' }}
+          onClick={handleMenuClick}
+          aria-label="Alternar menu lateral"
+        >
+          <Menu size={20} />
+        </button>
       </div>
     </header>
   );
