@@ -29,7 +29,7 @@ export async function fetchTree(tenant) {
 }
 
 function getTree() {
-  return memoryTree;
+  return Array.isArray(memoryTree) ? memoryTree : [];
 }
 
 export function getAllNodes() {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useParams, useNavigate } from 'react-router';
 import useAuthStore from '../../store/useAuthStore';
-import { setTenant } from '../../services/storageService';
+import { setTenant, fetchTree } from '../../services/storageService';
 
 function TenantLayout() {
   const { slug } = useParams();
@@ -15,8 +15,6 @@ function TenantLayout() {
       setTenant(slug);
 
       // Fetch the node tree from the Vercel API and load it into memory
-      // We import fetchTree from storageService
-      const { fetchTree } = await import('../../services/storageService');
       await fetchTree(slug);
 
       // Initialize auth store (loads settings and restores auth)
