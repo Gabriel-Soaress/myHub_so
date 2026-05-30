@@ -43,11 +43,21 @@ function FolderCard({ node }) {
           <Folder size={24} />
         </div>
         <div className="folder-card__actions" onClick={(e) => e.stopPropagation()}>
-          {!node.metadata?.downloadBlocked && !node.metadata?.password && (
+          {!node.metadata?.downloadBlocked && (
             <button
               className="folder-card__action-btn"
               onClick={(e) => {
                 e.stopPropagation();
+                const unlockedNodes = useAuthStore.getState().unlockedNodes;
+                const unlockNode = useAuthStore.getState().unlockNode;
+                if (!isAuthenticated && node.metadata?.password && !unlockedNodes.includes(node.id)) {
+                  const pass = window.prompt("Este item é protegido por senha. Digite a senha para baixar:");
+                  if (pass !== node.metadata.password) {
+                    alert("Senha incorreta.");
+                    return;
+                  }
+                  unlockNode(node.id);
+                }
                 downloadFolderAsZip(node);
               }}
               aria-label="Baixar pasta em ZIP"

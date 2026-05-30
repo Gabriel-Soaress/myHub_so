@@ -63,11 +63,21 @@ function FileCard({ node }) {
           <Icon size={22} />
         </div>
         <div className="file-card__actions" onClick={(e) => e.stopPropagation()}>
-          {!node.metadata?.downloadBlocked && !node.metadata?.password && (
+          {!node.metadata?.downloadBlocked && (
             <button
               className="file-card__action-btn"
               onClick={(e) => {
                 e.stopPropagation();
+                const unlockedNodes = useAuthStore.getState().unlockedNodes;
+                const unlockNode = useAuthStore.getState().unlockNode;
+                if (!isAuthenticated && node.metadata?.password && !unlockedNodes.includes(node.id)) {
+                  const pass = window.prompt("Este item é protegido por senha. Digite a senha para baixar:");
+                  if (pass !== node.metadata.password) {
+                    alert("Senha incorreta.");
+                    return;
+                  }
+                  unlockNode(node.id);
+                }
                 downloadSingleFile(node);
               }}
               aria-label="Baixar arquivo"
