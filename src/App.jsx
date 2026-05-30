@@ -15,6 +15,7 @@ import DeleteConfirm from './components/admin/DeleteConfirm';
 import CodeEditorModal from './components/admin/CodeEditorModal';
 import MoveModal from './components/admin/MoveModal';
 import SettingsModal from './components/admin/SettingsModal';
+import ShareModal from './components/ui/ShareModal';
 import useAuthStore from './store/useAuthStore';
 import useUIStore from './store/useUIStore';
 import './App.css';
@@ -79,6 +80,7 @@ function App() {
       {activeModal === 'delete' && <DeleteConfirm />}
       {activeModal === 'move' && <MoveModal />}
       {activeModal === 'settings' && <SettingsModal />}
+      {activeModal === 'share' && <ShareModal />}
     </>
   );
 }

@@ -50,4 +50,7 @@ export const FOLDER_COLORS = [
   { name: 'Âmbar', value: '#d97706' },
   { name: 'Rosa', value: '#db2777' },
   { name: 'Cinza', value: '#64748b' },
+  { name: 'Amarelo', value: '#eab308' },
+  { name: 'Preto', value: '#0f172a' },
+  { name: 'Vermelho', value: '#ef4444' },
 ];

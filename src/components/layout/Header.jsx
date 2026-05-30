@@ -10,8 +10,6 @@ import './Layout.css';
 function Header() {
   const location = useLocation();
   const isLanding = location.pathname === '/';
-  const [copied, setCopied] = useState(false);
-
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const activeSlug = useAuthStore((s) => s.activeSlug);
   const openLoginModal = useAuthStore((s) => s.openLoginModal);
@@ -27,12 +25,6 @@ function Header() {
     } else {
       toggleSidebar();
     }
-  };
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/${activeSlug}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   // Don't show header on landing page
@@ -63,9 +55,9 @@ function Header() {
       <div className="header__right">
         <button
           className="header__share-btn"
-          onClick={handleCopyLink}
-          aria-label="Compartilhar portfólio"
-          title="Copiar link do portfólio"
+          onClick={() => openModal('share', { url: window.location.href })}
+          aria-label="Compartilhar"
+          title="Compartilhar esta página"
           style={{
             display: 'flex', alignItems: 'center', gap: '0.5rem',
             background: 'var(--primary-50)', color: 'var(--primary-600)',
@@ -75,8 +67,8 @@ function Header() {
             marginRight: '0.5rem'
           }}
         >
-          {copied ? <Check size={16} /> : <Share2 size={16} />}
-          {copied ? 'Link Copiado!' : 'Compartilhar'}
+          <Share2 size={16} />
+          Compartilhar
         </button>
         <SearchBar />
         {isAuthenticated ? (
