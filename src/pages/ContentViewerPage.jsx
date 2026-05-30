@@ -14,8 +14,7 @@ import {
   Lock,
   Download,
   ChevronLeft,
-  MoveRight,
-  Video
+  MoveRight
 } from 'lucide-react';
 import { getNodeById, getFile, isNodeLockedCascading, updateNode, deleteNodeRecursive } from '../services/storageService';
 import { exportHtmlToPdf, exportHtmlToDocx } from '../services/exportService';
@@ -31,7 +30,6 @@ import ImageViewer from '../components/viewers/ImageViewer';
 import FileDownload from '../components/viewers/FileDownload';
 import CodeViewer from '../components/viewers/CodeViewer';
 import DocxViewer from '../components/viewers/DocxViewer';
-import VideoViewer from '../components/viewers/VideoViewer';
 import RichTextEditorInline from '../components/admin/RichTextEditorInline';
 
 import './ContentViewerPage.css';
@@ -184,7 +182,6 @@ function ContentViewerPage() {
     richtext: FileText,
     pdf: FileText,
     image: Image,
-    video: Video,
     download: FileDown,
     code: FileCode,
     docx: FileText
@@ -290,7 +287,6 @@ function ContentViewerPage() {
               {contentType === 'richtext' && <RichTextViewer content={node.content?.body} />}
               {contentType === 'pdf' && <PdfViewer nodeId={nodeId} />}
               {contentType === 'image' && <ImageViewer nodeId={nodeId} name={node.name} />}
-              {contentType === 'video' && <VideoViewer nodeId={nodeId} name={node.name} fileData={fileData} />}
               {contentType === 'code' && <CodeViewer nodeId={nodeId} node={node} />}
               {contentType === 'docx' && <DocxViewer nodeId={nodeId} node={node} />}
               {(contentType === 'download' || contentType === 'gallery') && (

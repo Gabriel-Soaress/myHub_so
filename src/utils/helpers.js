@@ -82,9 +82,6 @@ export function getMimeType(filename) {
     gif: 'image/gif',
     webp: 'image/webp',
     svg: 'image/svg+xml',
-    mp4: 'video/mp4',
-    webm: 'video/webm',
-    ogg: 'video/ogg',
     doc: 'application/msword',
     docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     ppt: 'application/vnd.ms-powerpoint',
@@ -154,7 +151,6 @@ export function debounce(fn, ms = 300) {
  */
 export function detectContentType(mimeType) {
   if (mimeType?.startsWith('image/')) return 'image';
-  if (mimeType?.startsWith('video/')) return 'video';
   if (mimeType === 'application/pdf') return 'pdf';
   if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || mimeType === 'application/msword') return 'docx';
   
