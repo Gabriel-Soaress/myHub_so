@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router';
-import { FileText, Image, FileDown, File, Pencil, Trash2, FileCode, Lock, MoveRight } from 'lucide-react';
+import { FileText, Image, FileDown, File, Pencil, Trash2, FileCode, Lock, MoveRight, Download } from 'lucide-react';
 import useAuthStore from '../../store/useAuthStore';
 import useUIStore from '../../store/useUIStore';
 import { formatDateShort } from '../../utils/helpers';
+import { downloadSingleFile } from '../../services/exportService';
 import './Explorer.css';
 
 const TYPE_ICONS = {
@@ -61,34 +62,49 @@ function FileCard({ node }) {
         >
           <Icon size={22} />
         </div>
-        {isAuthenticated && (
-          <div className="file-card__actions">
+        <div className="file-card__actions" onClick={(e) => e.stopPropagation()}>
+          {!node.metadata?.downloadBlocked && !node.metadata?.password && (
             <button
               className="file-card__action-btn"
-              onClick={handleMove}
-              aria-label="Mover conteúdo"
-              title="Mover"
+              onClick={(e) => {
+                e.stopPropagation();
+                downloadSingleFile(node);
+              }}
+              aria-label="Baixar arquivo"
+              title="Baixar"
             >
-              <MoveRight size={14} />
+              <Download size={14} />
             </button>
-            <button
-              className="file-card__action-btn"
-              onClick={handleEdit}
-              aria-label="Editar conteúdo"
-              title="Editar"
-            >
-              <Pencil size={14} />
-            </button>
-            <button
-              className="file-card__action-btn file-card__action-btn--danger"
-              onClick={handleDelete}
-              aria-label="Excluir conteúdo"
-              title="Excluir"
-            >
-              <Trash2 size={14} />
-            </button>
-          </div>
-        )}
+          )}
+          {isAuthenticated && (
+            <>
+              <button
+                className="file-card__action-btn"
+                onClick={handleMove}
+                aria-label="Mover conteúdo"
+                title="Mover"
+              >
+                <MoveRight size={14} />
+              </button>
+              <button
+                className="file-card__action-btn"
+                onClick={handleEdit}
+                aria-label="Editar conteúdo"
+                title="Editar"
+              >
+                <Pencil size={14} />
+              </button>
+              <button
+                className="file-card__action-btn file-card__action-btn--danger"
+                onClick={handleDelete}
+                aria-label="Excluir conteúdo"
+                title="Excluir"
+              >
+                <Trash2 size={14} />
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       <h3 className="file-card__name" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

@@ -127,3 +127,54 @@ export async function exportHtmlToDocx(htmlContent, filename) {
     alert('Erro ao exportar arquivo DOCX. ' + err.message);
   }
 }
+
+/**
+ * Baixa um único arquivo diretamente
+ */
+export async function downloadSingleFile(node) {
+  if (node?.metadata?.downloadBlocked) {
+    alert('Download bloqueado pelo administrador.');
+    return;
+  }
+  
+  if (node.content?.type === CONTENT_TYPES.CODE && node.content?.body) {
+    const blob = new Blob([node.content.body], { type: 'text/plain' });
+    saveAs(blob, node.metadata?.originalName || `${node.name}${node.metadata?.extension || '.txt'}`);
+    return;
+  }
+  
+  if (node.content?.type === CONTENT_TYPES.RICHTEXT) {
+    // Para simplificar via card, baixa como HTML
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>${node.name}</title>
+        <style>body { font-family: sans-serif; padding: 20px; }</style>
+      </head>
+      <body>
+        <h1>${node.name}</h1>
+        ${node.content.body}
+      </body>
+      </html>
+    `;
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    saveAs(blob, `${node.name}.html`);
+    return;
+  }
+  
+  const base64 = await getFile(node.id);
+  if (base64) {
+    const parts = base64.split(',');
+    if (parts.length > 1) {
+      const byteString = atob(parts[1]);
+      const u8 = new Uint8Array(byteString.length);
+      for (let i = 0; i < byteString.length; i++) {
+        u8[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([u8]);
+      saveAs(blob, node.metadata?.originalName || node.name);
+    }
+  }
+}

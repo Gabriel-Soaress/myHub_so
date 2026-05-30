@@ -46,7 +46,10 @@ function FolderCard({ node }) {
           {!node.metadata?.downloadBlocked && !node.metadata?.password && (
             <button
               className="folder-card__action-btn"
-              onClick={() => downloadFolderAsZip(node)}
+              onClick={(e) => {
+                e.stopPropagation();
+                downloadFolderAsZip(node);
+              }}
               aria-label="Baixar pasta em ZIP"
               title="Baixar em ZIP"
             >

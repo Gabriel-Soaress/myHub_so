@@ -13,15 +13,15 @@ import {
   FileCode,
   Lock,
   Download,
-  MoveRight
+  ChevronLeft
 } from 'lucide-react';
-import { getNodeById, getFile, isNodeLockedCascading } from '../services/storageService';
+import { getNodeById, getFile, isNodeLockedCascading, updateNode, deleteNodeRecursive } from '../services/storageService';
 import { exportHtmlToPdf, exportHtmlToDocx } from '../services/exportService';
 import useAuthStore from '../store/useAuthStore';
 import useUIStore from '../store/useUIStore';
 import Breadcrumb from '../components/layout/Breadcrumb';
 import Button from '../components/ui/Button';
-import { formatDate, base64ToBlob } from '../utils/helpers';
+import { formatDate, formatDateShort, base64ToBlob } from '../utils/helpers';
 
 import RichTextViewer from '../components/viewers/RichTextViewer';
 import PdfViewer from '../components/viewers/PdfViewer';
@@ -29,6 +29,7 @@ import ImageViewer from '../components/viewers/ImageViewer';
 import FileDownload from '../components/viewers/FileDownload';
 import CodeViewer from '../components/viewers/CodeViewer';
 import DocxViewer from '../components/viewers/DocxViewer';
+import RichTextEditorInline from '../components/admin/RichTextEditorInline';
 
 import './ContentViewerPage.css';
 
@@ -40,8 +41,8 @@ function ContentViewerPage() {
   const [loading, setLoading] = useState(true);
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordError, setPasswordError] = useState(false);
+  const [isEditingText, setIsEditingText] = useState(false);
   
-  // Guardar o parentId original para saber pra onde voltar caso seja excluído
   const [originalParentId, setOriginalParentId] = useState(null);
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -50,11 +51,12 @@ function ContentViewerPage() {
   const unlockNode = useAuthStore((s) => s.unlockNode);
   const openModal = useUIStore((s) => s.openModal);
   const refreshKey = useUIStore((s) => s.refreshKey);
+  const triggerRefresh = useUIStore((s) => s.triggerRefresh);
 
   useEffect(() => {
     const loadContent = async () => {
       setLoading(true);
-      const found = getNodeById(nodeId);
+      const found = await getNodeById(nodeId);
       
       if (found) {
         setNode(found);
@@ -64,7 +66,7 @@ function ContentViewerPage() {
         
         if (lockStatus.locked) {
           // Locked
-        } else if (found.content?.type !== 'richtext') {
+        } else if (found.content?.type !== 'richtext' && found.content?.type !== 'code') {
           const data = await getFile(nodeId);
           setFileData(data);
         }
@@ -89,6 +91,41 @@ function ContentViewerPage() {
     }
   };
 
+  const handleEditMetadata = () => {
+    openModal('editContent', node);
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('Tem certeza que deseja excluir este arquivo?')) {
+      await deleteNodeRecursive(node.id);
+      triggerRefresh();
+      navigate(node.parentId ? `/${activeSlug}/explorar/${node.parentId}` : `/${activeSlug}/explorar`);
+    }
+  };
+
+  const handleSaveText = async (newHtml) => {
+    try {
+      await updateNode(node.id, {
+        ...node,
+        content: {
+          ...node.content,
+          body: newHtml
+        }
+      });
+      setNode(prev => ({
+        ...prev,
+        content: {
+          ...prev.content,
+          body: newHtml
+        }
+      }));
+      setIsEditingText(false);
+      triggerRefresh();
+    } catch (err) {
+      alert('Erro ao salvar o texto: ' + err.message);
+    }
+  };
+
   if (loading) {
     return <div className="content-viewer content-viewer--loading">Carregando...</div>;
   }
@@ -108,10 +145,6 @@ function ContentViewerPage() {
       </div>
     );
   }
-
-  const handleEdit = () => openModal('editContent', node);
-  const handleDelete = () => openModal('delete', node);
-  const handleMove = () => openModal('move', node);
 
   const isLocked = lockStatus.locked;
 
@@ -155,39 +188,47 @@ function ContentViewerPage() {
   const ContentIcon = TYPE_ICONS[contentType] || File;
 
   return (
-    <div className="content-viewer">
-      <Breadcrumb nodeId={nodeId} />
+    <div className="content-viewer animate-fade-in-up">
+      <div className="content-viewer__top">
+        <Button variant="ghost" size="sm" icon={ChevronLeft} onClick={() => navigate(`/${activeSlug}/explorar/${node.parentId || ''}`)}>
+          Voltar
+        </Button>
+        <Breadcrumb nodeId={node.id} />
+      </div>
 
-      {/* Back button */}
-      <button
-        className="content-viewer__back"
-        onClick={() => navigate(node.parentId ? `/${activeSlug}/explorar/${node.parentId}` : `/${activeSlug}/explorar`)}
-      >
-        <ArrowLeft size={16} />
-        <span>Voltar</span>
-      </button>
-
-      {/* Header */}
-      <div className="content-viewer__header">
-        <div className="content-viewer__title-row">
-          <div className="content-viewer__icon">
-            <ContentIcon size={24} />
+      <div className="content-viewer__container">
+        <header className="content-viewer__header">
+          <div className="viewer-header__info">
+            <h1 className="viewer-header__title">{node.name}</h1>
+            <div className="viewer-header__meta">
+              <span>Criado em {formatDateShort(node.createdAt)}</span>
+              {node.updatedAt && <span>Atualizado em {formatDateShort(node.updatedAt)}</span>}
+              {node.metadata?.description && <span className="viewer-header__desc">{node.metadata.description}</span>}
+            </div>
           </div>
-          <h1 className="content-viewer__title">{node.name}</h1>
-        </div>
 
-        <div className="content-viewer__meta">
-          <span className="content-viewer__meta-item">
-            <Calendar size={14} />
-            Criado em {formatDate(node.createdAt)}
-          </span>
-          {node.updatedAt !== node.createdAt && (
-            <span className="content-viewer__meta-item">
-              <Clock size={14} />
-              Atualizado em {formatDate(node.updatedAt)}
-            </span>
+          {isAuthenticated && (
+            <div className="viewer-header__actions" style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {contentType === 'richtext' && !isEditingText && (
+                <Button variant="primary" size="sm" icon={FileText} onClick={() => setIsEditingText(true)}>
+                  Editar Texto
+                </Button>
+              )}
+              {contentType === 'richtext' && isEditingText && (
+                <Button variant="secondary" size="sm" onClick={() => setIsEditingText(false)}>
+                  Cancelar Edição
+                </Button>
+              )}
+              
+              <Button variant="ghost" size="sm" icon={Pencil} onClick={handleEditMetadata}>
+                {contentType === 'richtext' ? 'Opções' : 'Editar'}
+              </Button>
+              <Button variant="ghost" size="sm" icon={Trash2} onClick={handleDelete} className="text-danger">
+                Excluir
+              </Button>
+            </div>
           )}
-        </div>
+        </header>
 
         <div className="content-viewer__actions" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', flexWrap: 'wrap' }}>
           {contentType === 'richtext' && !node.metadata?.downloadBlocked && (
@@ -228,33 +269,28 @@ function ContentViewerPage() {
               Baixar Arquivo
             </Button>
           )}
+        </div>
 
-          {isAuthenticated && (
-            <div className="viewer-header__actions" style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
-              <Button variant="ghost" size="sm" icon={MoveRight} onClick={handleMove}>
-                Mover
-              </Button>
-              <Button variant="ghost" size="sm" icon={Pencil} onClick={handleEdit}>
-                Editar
-              </Button>
-              <Button variant="ghost" size="sm" icon={Trash2} onClick={handleDelete} className="text-danger">
-                Excluir
-              </Button>
+        <div className="content-viewer__body">
+          {isEditingText && contentType === 'richtext' ? (
+            <RichTextEditorInline 
+              initialContent={node.content?.body} 
+              onSave={handleSaveText} 
+              onCancel={() => setIsEditingText(false)} 
+            />
+          ) : (
+            <div id="richtext-export-area">
+              {contentType === 'richtext' && <RichTextViewer content={node.content?.body} />}
+              {contentType === 'pdf' && <PdfViewer nodeId={nodeId} />}
+              {contentType === 'image' && <ImageViewer nodeId={nodeId} name={node.name} />}
+              {contentType === 'code' && <CodeViewer nodeId={nodeId} node={node} />}
+              {contentType === 'docx' && <DocxViewer nodeId={nodeId} node={node} />}
+              {(contentType === 'download' || contentType === 'gallery') && (
+                <FileDownload node={node} nodeId={nodeId} />
+              )}
             </div>
           )}
         </div>
-      </div>
-
-      {/* Content Body */}
-      <div className="content-viewer__body" id="richtext-export-area">
-        {contentType === 'richtext' && <RichTextViewer content={node.content?.body} />}
-        {contentType === 'pdf' && <PdfViewer nodeId={nodeId} />}
-        {contentType === 'image' && <ImageViewer nodeId={nodeId} name={node.name} />}
-        {contentType === 'code' && <CodeViewer nodeId={nodeId} node={node} />}
-        {contentType === 'docx' && <DocxViewer nodeId={nodeId} node={node} />}
-        {(contentType === 'download' || contentType === 'gallery') && (
-          <FileDownload node={node} nodeId={nodeId} />
-        )}
       </div>
     </div>
   );
