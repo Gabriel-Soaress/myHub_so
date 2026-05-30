@@ -48,7 +48,7 @@ function Header() {
       <div className="header__right">
         <button
           className="header__share-btn"
-          onClick={() => openModal('share', { url: window.location.href })}
+          onClick={() => openModal('share', { url: `${window.location.origin}/${activeSlug}` })}
           aria-label="Compartilhar"
           title="Compartilhar esta página"
           style={{

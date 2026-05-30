@@ -329,3 +329,27 @@
 .file-download__btn:active {
   transform: translateY(0);
 }
+
+/* --- Docx Viewer --- */
+.docx-viewer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+.docx-wrapper {
+  background: transparent !important;
+  padding: 0 !important;
+  width: 100% !important;
+  overflow-x: auto;
+}
+
+.docx-wrapper > section.docx {
+  max-width: 100% !important;
+  box-sizing: border-box;
+  padding: var(--space-4) !important;
+  margin-bottom: 0 !important;
+  box-shadow: var(--shadow-sm) !important;
+}

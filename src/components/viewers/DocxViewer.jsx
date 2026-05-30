@@ -25,7 +25,7 @@ function DocxViewer({ nodeId }) {
           if (isMounted && containerRef.current) {
             await renderAsync(blob, containerRef.current, null, {
               inWrapper: true,
-              ignoreWidth: false,
+              ignoreWidth: true,
               ignoreHeight: true,
               useBase64URL: true,
             });
