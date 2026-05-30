@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router';
-import { Menu, Lock, LogOut, ShieldCheck, Settings, Share2, Check, Layout } from 'lucide-react';
+import { Menu, Lock, LogOut, ShieldCheck, Settings, Share2, Check, Layout, AlignLeft } from 'lucide-react';
 import { useState } from 'react';
 import SearchBar from '../ui/SearchBar';
 import useAuthStore from '../../store/useAuthStore';
@@ -40,15 +40,15 @@ function Header() {
         >
           <Menu size={20} />
         </button>
-        <Link to={`/${activeSlug}`} className="header__brand">
+        <Link to={`/${activeSlug}`} className="header__brand" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
           <div className="header__logo">
-            <Layout size={20} color="var(--primary-600)" />
+            <AlignLeft size={20} color="var(--primary-600)" />
           </div>
-          <span className="header__title">{APP_NAME}</span>
+          <span className="header__logo-text" style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--text-primary)' }}>{APP_NAME}</span>
         </Link>
       </div>
 
-      <div className="header__center">
+      <div className="header__center hide-on-mobile">
         <SearchBar />
       </div>
 
@@ -70,54 +70,56 @@ function Header() {
           <Share2 size={16} />
           <span className="hide-on-mobile">Compartilhar</span>
         </button>
-        {isAuthenticated ? (
-          <div className="header__admin-group">
-            <span className="header__admin-badge">
-              <ShieldCheck size={14} />
-              <span className="hide-on-mobile">Admin</span>
-            </span>
-            <button
-              className="header__icon-btn"
-              onClick={() => openModal('settings')}
-              aria-label="Configurações"
-              title="Configurações do Hub"
-            >
-              <Settings size={18} />
-            </button>
-            <button
-              className="header__icon-btn"
-              onClick={logout}
-              aria-label="Sair"
-              title="Sair do modo administrador"
-            >
-              <LogOut size={18} />
-            </button>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <button
-              onClick={() => window.open('/', '_blank')}
-              style={{
-                background: 'var(--primary-600)', color: 'white', padding: '0.4rem 0.75rem',
-                borderRadius: 'var(--radius-full)', border: 'none', fontSize: '13px',
-                fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s',
-                display: 'flex', alignItems: 'center', gap: '0.35rem'
-              }}
-              title="Crie seu próprio portfólio"
-            >
-              <Layout size={14} />
-              <span className="hide-on-mobile">Criar Portfólio</span>
-            </button>
-            <button
-              className="header__icon-btn"
-              onClick={openLoginModal}
-              aria-label="Entrar como administrador"
-              title="Entrar como administrador"
-            >
-              <Lock size={18} />
-            </button>
-          </div>
-        )}
+        <div className="hide-on-mobile" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {isAuthenticated ? (
+            <div className="header__admin-group">
+              <span className="header__admin-badge">
+                <ShieldCheck size={14} />
+                <span className="hide-on-mobile">Admin</span>
+              </span>
+              <button
+                className="header__icon-btn"
+                onClick={() => openModal('settings')}
+                aria-label="Configurações"
+                title="Configurações do Hub"
+              >
+                <Settings size={18} />
+              </button>
+              <button
+                className="header__icon-btn"
+                onClick={logout}
+                aria-label="Sair"
+                title="Sair do modo administrador"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <button
+                onClick={() => window.open('/', '_blank')}
+                style={{
+                  background: 'var(--primary-600)', color: 'white', padding: '0.4rem 0.75rem',
+                  borderRadius: 'var(--radius-full)', border: 'none', fontSize: '13px',
+                  fontWeight: '500', cursor: 'pointer', transition: 'all 0.2s',
+                  display: 'flex', alignItems: 'center', gap: '0.35rem'
+                }}
+                title="Crie seu próprio portfólio"
+              >
+                <AlignLeft size={14} />
+                <span className="hide-on-mobile">Criar Portfólio</span>
+              </button>
+              <button
+                className="header__icon-btn"
+                onClick={openLoginModal}
+                aria-label="Entrar como administrador"
+                title="Entrar como administrador"
+              >
+                <Lock size={18} />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

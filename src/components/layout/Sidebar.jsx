@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import { ChevronRight, Folder, X, ArrowLeft } from 'lucide-react';
+import { ChevronRight, Folder, X, ArrowLeft, Lock, LogOut, ShieldCheck, Settings, Layout } from 'lucide-react';
+import SearchBar from '../ui/SearchBar';
 import { getChildren, getAncestors } from '../../services/storageService';
 import useUIStore from '../../store/useUIStore';
 import useAuthStore from '../../store/useAuthStore';
@@ -155,7 +156,7 @@ function Sidebar() {
           </div>
         )}
 
-        <nav className="sidebar__nav">
+        <nav className="sidebar__nav hide-on-mobile">
           {rootFolders.length > 0 ? (
             rootFolders.map((folder) => (
               <SidebarItem
@@ -168,6 +169,41 @@ function Sidebar() {
             <p className="sidebar__empty">Nenhuma pasta criada</p>
           )}
         </nav>
+
+        {isSidebarMobile && (
+          <div className="sidebar__mobile-actions" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
+            <div style={{ width: '100%' }}>
+              <p style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--gray-500)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Busca</p>
+              <SearchBar />
+            </div>
+
+            <div style={{ width: '100%' }}>
+              <p style={{ fontSize: '12px', fontWeight: 'bold', color: 'var(--gray-500)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Opções</p>
+              {useAuthStore.getState().isAuthenticated ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'var(--primary-50)', color: 'var(--primary-700)', borderRadius: 'var(--radius-md)', fontWeight: '500', fontSize: '14px', width: 'fit-content' }}>
+                    <ShieldCheck size={16} /> Admin Autenticado
+                  </div>
+                  <button onClick={() => useUIStore.getState().openModal('settings')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500', textAlign: 'left' }}>
+                    <Settings size={18} /> Configurações do Hub
+                  </button>
+                  <button onClick={() => useAuthStore.getState().logout()} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500', textAlign: 'left' }}>
+                    <LogOut size={18} /> Sair do Admin
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <button onClick={() => window.open('/', '_blank')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', background: 'var(--primary-600)', color: 'white', borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: '500', textAlign: 'left' }}>
+                    <Layout size={18} /> Criar meu Portfólio
+                  </button>
+                  <button onClick={() => useAuthStore.getState().openLoginModal()} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', fontSize: '14px', fontWeight: '500', textAlign: 'left' }}>
+                    <Lock size={18} /> Entrar como Admin
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </aside>
     </>
   );

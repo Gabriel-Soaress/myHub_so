@@ -331,31 +331,15 @@
   }
 
   .header__center {
-    display: flex;
-    width: 100%;
-    order: 99;
-    padding: var(--space-2) 0;
+    display: none;
   }
 
   .header {
-    height: auto;
-    min-height: var(--header-height);
-    flex-wrap: wrap;
-    padding: var(--space-2) var(--space-3);
+    padding: 0 var(--space-3);
   }
 
-  .header__left, .header__right {
-    height: 48px; /* Give them a fixed height row so they align vertically */
-  }
-
-  .header__right {
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
-  .header__center .search-bar {
-    width: 100%;
-    max-width: none;
+  .header__right .search-bar {
+    width: 140px;
   }
 
   .sidebar {
