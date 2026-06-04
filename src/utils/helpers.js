@@ -146,13 +146,11 @@ export function debounce(fn, ms = 300) {
   };
 }
 
-/**
- * Detecta tipo de conteúdo pelo MIME
- */
 export function detectContentType(mimeType) {
   if (mimeType?.startsWith('image/')) return 'image';
   if (mimeType === 'application/pdf') return 'pdf';
   if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || mimeType === 'application/msword') return 'docx';
+  if (mimeType === 'application/vnd.ms-excel' || mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || mimeType === 'text/csv') return 'spreadsheet';
   
   if (
     mimeType?.startsWith('text/') || 

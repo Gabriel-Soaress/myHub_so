@@ -20,6 +20,7 @@ export const CONTENT_TYPES = {
   RICHTEXT: 'richtext',
   PDF: 'pdf',
   IMAGE: 'image',
+  SPREADSHEET: 'spreadsheet',
   GALLERY: 'gallery',
   DOWNLOAD: 'download',
   CODE: 'code',
@@ -30,6 +31,7 @@ export const FILE_ICONS = {
   richtext: 'FileText',
   pdf: 'FileText',
   image: 'Image',
+  spreadsheet: 'Table',
   gallery: 'Images',
   download: 'FileDown',
   code: 'FileCode',
@@ -38,7 +40,8 @@ export const FILE_ICONS = {
 export const ACCEPTED_FILE_TYPES = {
   pdf: '.pdf',
   image: '.jpg,.jpeg,.png,.gif,.webp,.svg',
-  download: '.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar,.txt,.csv',
+  spreadsheet: '.xls,.xlsx,.csv',
+  download: '.doc,.docx,.ppt,.pptx,.zip,.rar,.txt',
   code: '.js,.jsx,.ts,.tsx,.html,.css,.cpp,.c,.py,.java,.json,.md',
 };
 

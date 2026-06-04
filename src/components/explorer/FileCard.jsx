@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { FileText, Image, FileDown, File, Pencil, Trash2, FileCode, Lock, MoveRight, Download } from 'lucide-react';
+import { FileText, Image, FileDown, File, Pencil, Trash2, FileCode, Lock, MoveRight, Download, Table } from 'lucide-react';
 import useAuthStore from '../../store/useAuthStore';
 import useUIStore from '../../store/useUIStore';
 import { formatDateShort } from '../../utils/helpers';
@@ -14,6 +14,7 @@ const TYPE_ICONS = {
   gallery: Image,
   download: FileDown,
   code: FileCode,
+  spreadsheet: Table,
 };
 
 const TYPE_COLORS = {
@@ -22,6 +23,7 @@ const TYPE_COLORS = {
   image: '#10b981',
   gallery: '#f59e0b',
   download: 'var(--gray-500)',
+  spreadsheet: '#10b981', // Excel green color
 };
 
 function FileCard({ node }) {

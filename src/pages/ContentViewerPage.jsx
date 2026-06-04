@@ -15,7 +15,8 @@ import {
   ChevronLeft,
   MoveRight,
   Lightbulb,
-  File
+  File,
+  Table
 } from 'lucide-react';
 import { getNodeById, getFile, isNodeLockedCascading, updateNode, deleteNodeRecursive } from '../services/storageService';
 import { exportHtmlToPdf, exportHtmlToDocx } from '../services/exportService';
@@ -31,6 +32,7 @@ import ImageViewer from '../components/viewers/ImageViewer';
 import FileDownload from '../components/viewers/FileDownload';
 import CodeViewer from '../components/viewers/CodeViewer';
 import DocxViewer from '../components/viewers/DocxViewer';
+import SpreadsheetViewer from '../components/viewers/SpreadsheetViewer';
 import RichTextEditorInline from '../components/admin/RichTextEditorInline';
 
 import './ContentViewerPage.css';
@@ -200,7 +202,8 @@ function ContentViewerPage() {
     image: Image,
     download: FileDown,
     code: FileCode,
-    docx: FileText
+    docx: FileText,
+    spreadsheet: Table
   };
   const ContentIcon = TYPE_ICONS[contentType] || File;
 
@@ -305,6 +308,7 @@ function ContentViewerPage() {
               {contentType === 'image' && <ImageViewer nodeId={nodeId} name={node.name} />}
               {contentType === 'code' && <CodeViewer nodeId={nodeId} node={node} />}
               {contentType === 'docx' && <DocxViewer nodeId={nodeId} node={node} />}
+              {contentType === 'spreadsheet' && <SpreadsheetViewer nodeId={nodeId} />}
               {(contentType === 'download' || contentType === 'gallery') && (
                 <FileDownload node={node} nodeId={nodeId} />
               )}
