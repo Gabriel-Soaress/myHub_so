@@ -9,12 +9,13 @@ import {
   FileText,
   Image,
   FileDown,
-  File,
   FileCode,
   Lock,
   Download,
   ChevronLeft,
-  MoveRight
+  MoveRight,
+  Lightbulb,
+  File
 } from 'lucide-react';
 import { getNodeById, getFile, isNodeLockedCascading, updateNode, deleteNodeRecursive } from '../services/storageService';
 import { exportHtmlToPdf, exportHtmlToDocx } from '../services/exportService';
@@ -44,6 +45,9 @@ function ContentViewerPage() {
   const [passwordError, setPasswordError] = useState(false);
   const [isEditingText, setIsEditingText] = useState(false);
   
+  const [isEditingReflection, setIsEditingReflection] = useState(false);
+  const [reflectionText, setReflectionText] = useState('');
+
   const [originalParentId, setOriginalParentId] = useState(null);
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -62,6 +66,7 @@ function ContentViewerPage() {
       if (found) {
         setNode(found);
         setOriginalParentId(found.parentId);
+        setReflectionText(found.metadata?.reflection || '');
         
         const lockStatus = isNodeLockedCascading(found.id, isAuthenticated, unlockedNodes);
         
@@ -124,6 +129,17 @@ function ContentViewerPage() {
       triggerRefresh();
     } catch (err) {
       alert('Erro ao salvar o texto: ' + err.message);
+    }
+  };
+
+  const handleSaveReflection = async () => {
+    try {
+      const updatedMetadata = { ...node.metadata, reflection: reflectionText };
+      await updateNode(node.id, { ...node, metadata: updatedMetadata });
+      setNode(prev => ({ ...prev, metadata: updatedMetadata }));
+      setIsEditingReflection(false);
+    } catch (err) {
+      alert('Erro ao salvar a reflexão: ' + err.message);
     }
   };
 
@@ -295,6 +311,41 @@ function ContentViewerPage() {
             </div>
           )}
         </div>
+
+        {(node.metadata?.reflection || isAuthenticated) && (
+          <div className="content-viewer__reflection" style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid var(--border-color)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Lightbulb size={20} color="var(--primary-500)" />
+                Reflexão
+              </h3>
+              {isAuthenticated && !isEditingReflection && (
+                <Button variant="ghost" size="sm" icon={Pencil} onClick={() => setIsEditingReflection(true)}>
+                  {node.metadata?.reflection ? 'Editar Reflexão' : 'Adicionar Reflexão'}
+                </Button>
+              )}
+            </div>
+
+            {isEditingReflection ? (
+              <div>
+                <textarea 
+                  value={reflectionText}
+                  onChange={e => setReflectionText(e.target.value)}
+                  placeholder="Escreva sua reflexão sobre este conteúdo..."
+                  style={{ width: '100%', minHeight: '120px', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'inherit', resize: 'vertical', marginBottom: '1rem' }}
+                />
+                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                  <Button variant="ghost" onClick={() => { setIsEditingReflection(false); setReflectionText(node.metadata?.reflection || ''); }}>Cancelar</Button>
+                  <Button variant="primary" onClick={handleSaveReflection}>Salvar</Button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ padding: '1.5rem', backgroundColor: 'var(--bg-tertiary)', borderRadius: 'var(--radius-md)', color: 'var(--text-secondary)', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                {node.metadata?.reflection || <span style={{ fontStyle: 'italic', opacity: 0.7 }}>Nenhuma reflexão adicionada.</span>}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
