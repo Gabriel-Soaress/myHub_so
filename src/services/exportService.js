@@ -41,7 +41,8 @@ async function collectFilesRecursive(folderId, currentPath, zipData) {
         zipData[filename] = strToU8(htmlContent);
       } 
       else if (child.content?.type === CONTENT_TYPES.CODE) {
-        const ext = child.metadata?.extension || '.txt';
+        let ext = child.metadata?.extension || '.txt';
+        if (!ext.startsWith('.') && ext !== '') ext = `.${ext}`;
         const filename = path.toLowerCase().endsWith(ext.toLowerCase()) ? path : `${path}${ext}`;
         zipData[filename] = strToU8(child.content.body);
       }
