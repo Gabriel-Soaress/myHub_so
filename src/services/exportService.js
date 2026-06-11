@@ -23,7 +23,6 @@ async function collectFilesRecursive(folderId, currentPath, zipData) {
       await collectFilesRecursive(child.id, path, zipData);
     } else {
       if (child.content?.type === CONTENT_TYPES.RICHTEXT) {
-        // Texto rico exportado como HTML
         const htmlContent = `
           <!DOCTYPE html>
           <html>
@@ -38,15 +37,15 @@ async function collectFilesRecursive(folderId, currentPath, zipData) {
           </body>
           </html>
         `;
-        zipData[`${path}.html`] = strToU8(htmlContent);
+        const filename = path.toLowerCase().endsWith('.html') ? path : `${path}.html`;
+        zipData[filename] = strToU8(htmlContent);
       } 
       else if (child.content?.type === CONTENT_TYPES.CODE) {
-        // Código exportado com sua extensão original (salvo no metadata ou padrão .txt)
         const ext = child.metadata?.extension || '.txt';
-        zipData[`${path}${ext}`] = strToU8(child.content.body);
+        const filename = path.toLowerCase().endsWith(ext.toLowerCase()) ? path : `${path}${ext}`;
+        zipData[filename] = strToU8(child.content.body);
       }
       else {
-        // Arquivo binário (PDF, Imagem, Download)
         const base64 = await getFile(child.id);
         if (base64) {
           const parts = base64.split(',');
@@ -56,9 +55,26 @@ async function collectFilesRecursive(folderId, currentPath, zipData) {
             for (let i = 0; i < byteString.length; i++) {
               u8[i] = byteString.charCodeAt(i);
             }
-            // Extensão baseada no nome original (se tiver no metadata)
-            const ext = child.metadata?.originalName ? '' : (child.content?.type === 'pdf' ? '.pdf' : '');
-            const filename = child.metadata?.originalName ? path : `${path}${ext}`;
+            
+            let ext = child.metadata?.extension || '';
+            
+            if (!ext) {
+              const origName = child.metadata?.originalName || child.content?.originalName || child.name;
+              const lastDot = origName.lastIndexOf('.');
+              if (lastDot !== -1 && origName.length - lastDot <= 5) {
+                ext = origName.substring(lastDot);
+              } else {
+                if (child.content?.type === 'pdf') ext = '.pdf';
+                else if (child.content?.type === 'image' || child.content?.mimeType?.startsWith('image/')) {
+                  ext = child.content?.mimeType ? `.${child.content.mimeType.split('/')[1]}` : '.png';
+                } else if (child.content?.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                  ext = '.docx';
+                }
+              }
+            }
+            
+            if (!ext.startsWith('.') && ext !== '') ext = `.${ext}`;
+            const filename = path.toLowerCase().endsWith(ext.toLowerCase()) ? path : `${path}${ext}`;
             zipData[filename] = u8;
           }
         }
